@@ -42,7 +42,7 @@ class InputBuffer
 				second = @buffer[j]
 				
 				
-				if first.key == second.key and first.direction == "↓" && second.direction == "↑"
+				if first.key == second.key and first.direction == :down && second.direction == :up
 					queue << [first.dt, second.dt]
 					
 					pair_found = true
@@ -54,7 +54,7 @@ class InputBuffer
 			
 			# Could not find a match for this one.
 			# If it's a down event, that means it's an ongoing press
-			if !pair_found and first.direction == "↓"
+			if !pair_found and first.direction == :down
 				queue << [first.dt, dt]
 			end
 		end
@@ -94,9 +94,9 @@ class InputBuffer
 	end
 	
 	
-	def append(id, direction_mark)
+	def append(id, direction)
 		char = $window.button_id_to_char(id)
-		@buffer << Input.new(char, direction_mark, dt) if char
+		@buffer << Input.new(char, direction, dt) if char
 	end
 	
 	def reset

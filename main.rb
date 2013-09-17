@@ -51,7 +51,7 @@ class Window < Gosu::Window
 				p @input_buffer
 				@input_buffer.reset
 			else
-				@input_buffer.append(id, "↓")
+				@input_buffer.append(id, :down)
 		end
 	end
 	
@@ -60,7 +60,7 @@ class Window < Gosu::Window
 			when Gosu::KbReturn
 				
 			else
-				@input_buffer.append(id, "↑")
+				@input_buffer.append(id, :up)
 		end
 	end
 	
