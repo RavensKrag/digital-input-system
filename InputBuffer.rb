@@ -1,5 +1,17 @@
 # encoding: utf-8
 
+class Array
+	def each_pair
+		self.each_index.each do |i|
+			((i+1)..(self.size-1)).each do |j|
+				
+				yield self[i], self[j]
+				
+			end
+		end
+	end
+end
+
 class InputBuffer
 	def initialize
 		@buffer = Array.new
@@ -15,36 +27,44 @@ class InputBuffer
 	end
 	
 	def draw
-		# queue = []
+		queue = []
 		
-		# @buffer.each_index.each do |i|
-		# 	(i..(@buffer.size-1).each do |j|
+		@buffer.each_index.each do |i|
+			((i+1)..(@buffer.size-1)).each do |j|
+				first = @buffer[i]
+				second = @buffer[j]
 				
-		# 		first = @buffer[i]
-		# 		second = @buffer[j]
 				
-		# 		if first[0] == second[0]
-		# 			queue << [first, second]
+				if first[0] == second[0] and first[1] == "↓" && second[1] == "↑"
+					queue << [first, second]
 					
-					
-		# 			break
-		# 		end
+					break
+				end
 				
-		# 	end
-		# end
+				
+			end
+		end
 		
-		# queue.each_index do |i|
-		# 	first, second = queue[i]
+		
+		
+		p queue
+		
+		
+		queue.each_with_index do |point_data, i|
+			# draw one line each iteration
+			points = point_data.collect do |data|
+				time = data.split[1].to_i
+				
+				CP::Vec2.new time/10, 0
+			end
 			
-		# 	p0 = first.split[1].to_i
-		# 	p1 = first.split[1].to_i
 			
-		# 	[p0, p1].each do |point|
-		# 		point.y += 10 * i
-		# 	end
+			points.each do |point|
+				point.y += 50 * i
+			end
 			
-		# 	draw_line p0, p1, 5
-		# end
+			draw_line points[0], points[1], 10
+		end
 	end
 	
 	
