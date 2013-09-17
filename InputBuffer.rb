@@ -84,6 +84,8 @@ class InputBuffer
 	
 	
 	def button_down(id)
+		@start_time = timestamp if @buffer.empty?
+		
 		char = $window.button_id_to_char(id)
 		@buffer << Input.new(char, :down, dt) if char
 	end
@@ -95,8 +97,6 @@ class InputBuffer
 	
 	def reset
 		@buffer.clear
-		
-		@start_time = timestamp
 	end
 	
 	def timestamp
