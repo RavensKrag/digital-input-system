@@ -15,36 +15,36 @@ class InputBuffer
 	end
 	
 	def draw
-		queue = []
+		# queue = []
 		
-		(0..(@buffer.size-1).each do |i|
-			(i..(@buffer.size-1).each do |j|
+		# @buffer.each_index.each do |i|
+		# 	(i..(@buffer.size-1).each do |j|
 				
-				first = @buffer[i]
-				second = @buffer[j]
+		# 		first = @buffer[i]
+		# 		second = @buffer[j]
 				
-				if first[0] == second[0]
-					queue << [first, second]
+		# 		if first[0] == second[0]
+		# 			queue << [first, second]
 					
 					
-					break
-				end
+		# 			break
+		# 		end
 				
-			end
-		end
+		# 	end
+		# end
 		
-		queue.each_index do |i|
-			first, second = queue[i]
+		# queue.each_index do |i|
+		# 	first, second = queue[i]
 			
-			p0 = first.split[1].to_i
-			p1 = first.split[1].to_i
+		# 	p0 = first.split[1].to_i
+		# 	p1 = first.split[1].to_i
 			
-			[p0, p1].each do |point|
-				point.y += 10 * i
-			end
+		# 	[p0, p1].each do |point|
+		# 		point.y += 10 * i
+		# 	end
 			
-			draw_line p0, p1, 5
-		end
+		# 	draw_line p0, p1, 5
+		# end
 	end
 	
 	
