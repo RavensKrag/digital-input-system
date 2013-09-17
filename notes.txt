@@ -1,0 +1,25 @@
+trial 1:
+	use buffer to gather input strings
+	
+	data:
+		tap
+		["u↓", "u↑"]
+		hold
+		["u↓", "u↑"]
+		sequence
+		["a↓", "a↑", "o↓", "o↑", "e↓", "e↑", "u↓", "u↑"]
+		sequence hold end
+		["a↓", "a↑", "o↓", "o↑", "e↓", "e↑", "u↓", "u↑"]
+		arpeggiated chord
+		["a↓", "o↓", "e↓", "u↓", "a↑", "o↑", "e↑", "u↑"]
+		chord
+		["a↓", "o↓", "e↓", "u↓", "a↑", "o↑", "e↑", "u↑"]
+		timed sequence
+		["a↓", "a↑", "o↓", "o↑", "e↓", "e↑", "u↓", "u↑"]
+
+
+	result: need time deltas
+
+
+
+
