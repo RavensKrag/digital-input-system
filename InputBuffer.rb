@@ -33,18 +33,29 @@ class InputBuffer
 		queue = []
 		
 		@buffer.each_index.each do |i|
+			first = @buffer[i]
+			
+			pair_found = false
+			
 			((i+1)..(@buffer.size-1)).each do |j|
-				first = @buffer[i]
+				
 				second = @buffer[j]
 				
 				
 				if first.key == second.key and first.direction == "↓" && second.direction == "↑"
 					queue << [first.dt, second.dt]
 					
+					pair_found = true
 					break
 				end
 				
 				
+			end
+			
+			# Could not find a match for this one.
+			# If it's a down event, that means it's an ongoing press
+			if !pair_found and first.direction == "↓"
+				queue << [first.dt, dt]
 			end
 		end
 		
