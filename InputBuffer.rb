@@ -33,12 +33,10 @@ class InputBuffer
 		queue = []
 		
 		@buffer.each_index.each do |i|
-			first = @buffer[i]
-			
 			pair_found = false
 			
 			((i+1)..(@buffer.size-1)).each do |j|
-				
+				first = @buffer[i]
 				second = @buffer[j]
 				
 				
@@ -54,19 +52,18 @@ class InputBuffer
 			
 			# Could not find a match for this one.
 			# If it's a down event, that means it's an ongoing press
-			if !pair_found and first.direction == :down
-				queue << [first.dt, dt]
+			time_event = @buffer[i]
+			if !pair_found and time_event.direction == :down
+				queue << [time_event.dt, dt]
 			end
 		end
-		
-		p queue
 		
 		queue.each_with_index do |point_data, i|
 			# draw one line each iteration
 			first_dt, second_dt = point_data
 			
-			scale = 1.to_f/10
-			
+			# scale = 1.to_f/10
+			scale = 1
 			
 			
 			points = [
