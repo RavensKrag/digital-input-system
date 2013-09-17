@@ -85,18 +85,12 @@ class InputBuffer
 	
 	def button_down(id)
 		char = $window.button_id_to_char(id)
-		@buffer[]
+		@buffer << Input.new(char, :down, dt) if char
 	end
 	
 	def button_up(id)
 		char = $window.button_id_to_char(id)
-		
-	end
-	
-	
-	def append(id, direction)
-		char = $window.button_id_to_char(id)
-		@buffer << Input.new(char, direction, dt) if char
+		@buffer << Input.new(char, :up, dt) if char
 	end
 	
 	def reset
