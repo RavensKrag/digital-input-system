@@ -13,6 +13,9 @@ class Array
 end
 
 class InputBuffer
+	Input = Struct.new :key, :direction, :dt
+	
+	
 	def initialize
 		@buffer = Array.new
 		reset
@@ -35,8 +38,8 @@ class InputBuffer
 				second = @buffer[j]
 				
 				
-				if first[0] == second[0] and first[1] == "↓" && second[1] == "↑"
-					queue << [first, second]
+				if first.key == second.key and first.direction == "↓" && second.direction == "↑"
+					queue << [first.dt, second.dt]
 					
 					break
 				end
@@ -45,22 +48,23 @@ class InputBuffer
 			end
 		end
 		
-		
-		
 		p queue
-		
 		
 		queue.each_with_index do |point_data, i|
 			# draw one line each iteration
-			points = point_data.collect do |data|
-				time = data.split[1].to_i
-				
-				CP::Vec2.new time/10, 0
-			end
+			first_dt, second_dt = point_data
 			
+			scale = 1.to_f/10
+			
+			
+			
+			points = [
+				CP::Vec2.new(first_dt*scale, 0),
+				CP::Vec2.new(second_dt*scale, 0)
+			]
 			
 			points.each do |point|
-				point.y += 50 * i
+				point.y += 30 * i
 			end
 			
 			draw_line points[0], points[1], 10
@@ -81,7 +85,7 @@ class InputBuffer
 	
 	def append(id, direction_mark)
 		char = $window.button_id_to_char(id)
-		@buffer << char + direction_mark + " " + dt.to_s if char
+		@buffer << Input.new(char, direction_mark, dt) if char
 	end
 	
 	def reset
