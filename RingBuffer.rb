@@ -7,20 +7,26 @@ class RingBuffer
 	end
 	
 	# Walk the whole buffer (do not loop)
+	# Each goes from new -> old
+	# reverse_each goes from old -> new
 	# TODO: Make it so that #each can return an iterator if no block supplied, like in Array#each
-	def each
-		head_to_end = (@head_index..(@queue.size-1)).to_a
-		start_to_tail = (0..tail_index).to_a
-		
-		(head_to_end + start_to_tail).each do |i|
-			item = @queue[i]
+	[:each, :reverse_each].do |method_name|
+	
+		define_method method_name do
+			head_to_end = (@head_index..(@queue.size-1)).to_a
+			start_to_tail = (0..tail_index).to_a
 			
-			unless item.nil?
-				yield item 
-			else
-				break # stop loop when you hit a nil
+			(head_to_end + start_to_tail).send method_name do |i|
+				item = @queue[i]
+				
+				unless item.nil?
+					yield item 
+				else
+					break # stop loop when you hit a nil
+				end
 			end
 		end
+		
 	end
 	
 	def push(*items)
