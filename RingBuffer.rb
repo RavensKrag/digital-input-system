@@ -1,58 +1,102 @@
 # Queues up items, discarding the oldest item when the size is reached
 
 class RingBuffer
+	# add new elements to the back of the line
+	# walk from the front to the back
+	
 	def initialize(size)
-		@queue = Arary.new(size)
+		@queue = Array.new(size)
 		@head_index = 0
+		@tail_index = @head_index
+		
+		@size = 0
+	end
+	
+	def clear
+		@queue.clear
+		@head_index = 0
+		@tail_index = @head_index
+		
+		@size = 0
+	end
+	
+	def empty?
+		@size == 0
 	end
 	
 	# Walk the whole buffer (do not loop)
 	# Each goes from new -> old
 	# reverse_each goes from old -> new
 	# TODO: Make it so that #each can return an iterator if no block supplied, like in Array#each
-	[:each, :reverse_each].do |method_name|
+	def each(start=0)
+		counter = wrapping_counter @head_index, @tail_index, @queue.size
+		counter[start..-1].each do |i|
+			yield @queue[i]
+		end
+	end
 	
-		define_method method_name do
-			head_to_end = (@head_index..(@queue.size-1)).to_a
-			start_to_tail = (0..tail_index).to_a
+	def each_with_index(start=0)
+		index = 0
+		
+		counter = wrapping_counter @head_index, @tail_index, @queue.size
+		counter[start..-1].each do |i|
+			yield @queue[i], index
 			
-			(head_to_end + start_to_tail).send method_name do |i|
-				item = @queue[i]
-				
-				unless item.nil?
-					yield item 
-				else
-					break # stop loop when you hit a nil
-				end
-			end
+			index += 1
 		end
-		
 	end
 	
-	def push(*items)
+	# Iterate over each pairwise combination of elements
+	def each_pair
+		# Ruby defines #combination and #permutation for iteration of those sorts of sets
+		
+		# counter = wrapping_counter @head_index, @tail_index, @queue.size
+		
+		# counter.each_index do |index|
+		# 	i = counter[index]
+			
+		# 	counter[(index+1)..-1].each do |j|
+		# 		yield @queue[i], @queue[j]
+		# 	end
+		# end
+		
+		# using #permutation means that the order will not be guaranteed
+		wrapping_counter(@head_index, @tail_index, @queue.size).permutation(2) do |i, j|
+			yield @queue[i], @queue[j]
+		end
+	end
+	
+	# add items to the back of the queue
+	def queue(*items)
 		items.each do |i|
-			advance_head
-			@queue[@head_index] = i
+			@queue[@tail_index] = i
+			advance_tail
+			
+			
 		end
 	end
 	
-	def pop(iterations=1)
-		raise "Must pop at least once" if iterations < 1
-		raise "Can't pop more times than there are items" if iterations > @queue.size
-		
-		output = Array.new
+	# take items out of the front of the queue
+	def dequeue(iterations=1)
+		out = Array.new
 		
 		iterations.times do
-			output << head
+			# get item from the front
+			out << @queue[@head_index]
+			# remove item from the queue
+			@queue[@head_index] = nil
+			# move the front
+			advance_head
 			
-			regress_head
+			# reduce size
+			@size -= 1
 		end
 		
 		
-		if output.size == 1
-			return output.first
+		if out.size == 1
+			return out.first
 		else
-			return output
+			return out
 		end
 	end
 	
@@ -67,19 +111,36 @@ class RingBuffer
 	
 	private
 	
-	# def wrapping_increment(i)
-	# 	i += 1
-	# 	i = 0 if i == @queue.size
-		
-	# 	return i
-	# end
 	
-	# def wrapping_decrement(i)
-	# 	i -= 1
-	# 	i = @queue.size-1 if i < 0
+	def wrapping_counter(head, tail, size, &block)
+		# size is the size of the entire container, not the interval between head and tail
+		raise "Head out of range" if head >= size or head < 0
+		raise "Tail out of range" if tail >= size or tail < 0
 		
-	# 	return i
-	# end
+		return if size == 0
+		return if head == tail # traversal range is zero
+		
+		out = Array.new unless block # if there is no block, return a list a numbers
+		
+		
+		i = head
+		
+		final = tail+1
+		final = 0 if final == size
+		begin # can't just say "< tail" because of wrap around
+			
+			if block
+				block.call i 
+			else
+				out << i
+			end
+			
+			i += 1
+			i = 0 if i == size
+		end while(i != final) 
+		
+		return out unless block # <- only return list if there isn't a block
+	end
 	
 	
 	
@@ -91,14 +152,36 @@ class RingBuffer
 	
 	# Move head to the previous position. Don't forget to wrap around.
 	def regress_head
-		@head_index -= 1
-		@head_index = @queue.size-1 if @head_index < 0
+		# @queue[@head_index] = nil
+		# @size -= 1 unless @size == 0
+		
+		# @head_index -= 1
+		# @head_index = @queue.size-1 if @head_index < 0
 	end
 	
-	def tail_index
-		i = @head_index - 1
-		i = @queue.size-1 if i < 0
+	# Move tail to the next position. Don't forget to wrap around.
+	def advance_tail
+		# circular overwrite
+		if @size == @queue.size
+			# buffer is at full capacity
+			# tail should be right up against the head at this point
+			# the only way new elements can come in, is if old ones are expired
+			# so move the head (which points to the oldest element) forward to make space
+			advance_head
+		else
+			@size += 1
+		end
 		
-		return i
+		# move index
+		@tail_index += 1
+		@tail_index = 0 if @tail_index == @queue.size
+	end
+	
+	def regress_tail
+		# @queue[@tail_index] = nil
+		# @size -= 1 unless @size == 0
+		
+		# @tail_index -= 1
+		# @tail_index = @queue.size-1 if @tail_index < 0
 	end
 end

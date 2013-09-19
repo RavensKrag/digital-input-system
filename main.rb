@@ -18,8 +18,8 @@ class Window < Gosu::Window
 	def initialize
 		$window = self
 		
-		height = 500
-		width = 500
+		height = 800
+		width = 800
 		fullscreen = false
 		
 		update_interval = 1/60.0
@@ -39,7 +39,7 @@ class Window < Gosu::Window
 	
 	def draw
 		translate 50, 50 do
-			@input_buffer.draw
+			# @input_buffer.draw
 		end
 	end
 	
@@ -48,7 +48,6 @@ class Window < Gosu::Window
 		
 		case id
 			when Gosu::KbReturn
-				p @input_buffer
 				@input_buffer.reset
 			else
 				@input_buffer.button_down id

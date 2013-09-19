@@ -1,25 +1,22 @@
 # encoding: utf-8
 
-class Array
-	def each_pair
-		self.each_index.each do |i|
-			((i+1)..(self.size-1)).each do |j|
-				
-				yield self[i], self[j]
-				
-			end
-		end
-	end
-end
+require './RingBuffer'
 
 class InputBuffer
 	Input = Struct.new :key, :direction, :dt
 	
 	
 	def initialize
-		@buffer = Array.new
+		@buffer = RingBuffer.new 100
 		reset
 	end
+	
+	#    ____        __              __ 
+	#   / __ \__  __/ /_____  __  __/ /_
+	#  / / / / / / / __/ __ \/ / / / __/
+	# / /_/ / /_/ / /_/ /_/ / /_/ / /_  
+	# \____/\__,_/\__/ .___/\__,_/\__/  
+	#               /_/                 
 	
 	def to_s
 		return @buffer.to_s
@@ -58,12 +55,44 @@ class InputBuffer
 			end
 		end
 		
+		
+		
+		
+		@buffer.each_pair do |first, second|
+			if first.key == second.key and first.direction == :down && second.direction == :up
+				queue << [first.dt, second.dt]
+				
+				pair_found = true
+				break
+			end
+		end
+		
+		
+		
+		@buffer.each_with_index do |first_item, i|
+			@buffer.each_with_index i do |second_item, j|
+				queue << [first.dt, second.dt]
+				
+				pair_found = true
+				break
+			end
+			
+			# Could not find a match for this one.
+			# If it's a down event, that means it's an ongoing press
+			time_event = @buffer[i]
+			if !pair_found and time_event.direction == :down
+				queue << [time_event.dt, dt]
+			end
+		end
+		
+		
+		
 		queue.each_with_index do |point_data, i|
 			# draw one line each iteration
 			first_dt, second_dt = point_data
 			
-			# scale = 1.to_f/10
-			scale = 1
+			scale = 1.to_f/2
+			# scale = 1
 			
 			
 			points = [
@@ -79,17 +108,23 @@ class InputBuffer
 		end
 	end
 	
+	#     __  ___      _       __        _          _____            __               
+	#    /  |/  /___ _(_)___  / /_____ _(_)___     / ___/__  _______/ /____  ____ ___ 
+	#   / /|_/ / __ `/ / __ \/ __/ __ `/ / __ \    \__ \/ / / / ___/ __/ _ \/ __ `__ \
+	#  / /  / / /_/ / / / / / /_/ /_/ / / / / /   ___/ / /_/ (__  ) /_/  __/ / / / / /
+	# /_/  /_/\__,_/_/_/ /_/\__/\__,_/_/_/ /_/   /____/\__, /____/\__/\___/_/ /_/ /_/ 
+	#                                                 /____/                          
 	
 	def button_down(id)
 		@start_time = timestamp if @buffer.empty?
 		
 		char = $window.button_id_to_char(id)
-		@buffer << Input.new(char, :down, dt) if char
+		@buffer.queue Input.new(char, :down, dt) if char
 	end
 	
 	def button_up(id)
 		char = $window.button_id_to_char(id)
-		@buffer << Input.new(char, :up, dt) if char
+		@buffer.queue Input.new(char, :up, dt) if char
 	end
 	
 	def reset
@@ -106,6 +141,8 @@ class InputBuffer
 	
 	
 	
+	
+	private
 	
 	def draw_line(p0, p1, width, z=0, color=0xffffffff)
 		# NOTE: Line represented as quad, but will not always fit tight in a AABB
