@@ -33,4 +33,89 @@ sequence
 	
 
 
+TODO: Separate into event start and event end sequences
+inputs with no separate up sequence can not be held
+they fire 
 
+tap
+	[
+		Input.new(Gosu::KbA, :down,	0),
+		
+		
+		
+		
+		Input.new(Gosu::KbA, :up,	20),
+	]
+	
+	short interval
+
+hold
+	[
+		Input.new(Gosu::KbA, :down,	0),
+		
+		
+		
+		Input.new(Gosu::KbA, :up,	200),
+	]
+	
+	long interval
+	
+sequence
+	[
+		Input.new(Gosu::KbA, :down,	0+300*0),
+		Input.new(Gosu::KbA, :up,	200+300*0),
+		
+		Input.new(Gosu::KbO, :down,	0+300*1),
+		Input.new(Gosu::KbO, :up,	200+300*1),
+		
+		Input.new(Gosu::KbE, :down,	0+300*2),
+		
+		-- potential hold (if there's a hold, break on the last key, otherwise just end)
+		
+		Input.new(Gosu::KbE, :up,	200+300*2),
+	]
+roll
+	[
+		Input.new(Gosu::KbA, :down,	0),
+		Input.new(Gosu::KbA, :up,	150),
+		
+		Input.new(Gosu::KbO, :down,	100),
+		Input.new(Gosu::KbO, :up,	250),
+		
+		Input.new(Gosu::KbE, :down,	200),
+		
+		-- potential hold (if there's a hold, break on the last key, otherwise just end)
+		
+		Input.new(Gosu::KbE, :up,	350)
+	]
+arp chord
+	[
+		Input.new(Gosu::KbA, :down,	0),
+		Input.new(Gosu::KbO, :down,	100),
+		Input.new(Gosu::KbE, :down,	200),
+		
+		
+		
+		
+		Input.new(Gosu::KbA, :up,	500),
+		Input.new(Gosu::KbO, :up,	500),
+		Input.new(Gosu::KbE, :up,	500),
+	]
+chord
+	[
+		Input.new(Gosu::KbA, :down,	0),
+		Input.new(Gosu::KbO, :down,	0),
+		Input.new(Gosu::KbE, :down,	0),
+		
+		
+		
+		
+		Input.new(Gosu::KbA, :up,	500),
+		Input.new(Gosu::KbO, :up,	500),
+		Input.new(Gosu::KbE, :up,	500),
+	]
+
+
+above sequences seem pretty easy to create a nice clean interface for
+the "sequence" type is different though,
+because the whole point is being able to list specific times between button presses

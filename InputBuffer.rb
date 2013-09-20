@@ -105,6 +105,10 @@ class InputBuffer
 	# /_/  /_/\__,_/_/_/ /_/\__/\__,_/_/_/ /_/   /____/\__, /____/\__/\___/_/ /_/ /_/ 
 	#                                                 /____/                          
 	
+	# TODO: Consider just sticking the string in the buffer instead of the input object
+	# if string match algorithms are going to be used to match,
+	# and a actual string is going to be used to match
+	# might be better to keep things as strings for most of the process
 	def button_down(id)
 		@start_time = timestamp if @buffer.empty?
 		
@@ -132,52 +136,15 @@ class InputBuffer
 	
 	# search through the input buffer for something that matches the supplied input sequence
 	def search(*inputs)
-		[
-			Input.new(Gosu::KbA, :down,	0),
-			Input.new(Gosu::KbA, :up,	200)
-		]
-		
-		string_buffer = @buffer.to_s
-		
-		# match - button press
-		# match without the timestamps, and then collect up all the timestamps
-		# basically, search for inputs, to find timestamps
-		# compare timestamps to get time deltas
-		# compare time deltas to DTs of keys
-		# match found 
-		# 	inputs[0].to_s but strip the dt off the end (match any dt)
-		# 	any sequence
-		# 	inputs[1].to_s but strip the dt off the end (match any dt)
-		
-		
-		data_regex = /.*?[↑|↓]/
-		
-		# match 0 or more of any character (non greedy), followed by up/down arrow, then digits
-		# scan can return multiple matches
-		data, dt = inputs[0].to_s.scan(/#{data_regex})(\d*)/).first
-		
-		
-		search_regex = /#{data}(\d*)[,#{data_regex}[\d*],]*/
-		# next part of the regex, is the same idea again, but with the next data chunk
-		# captures should find DTs
-		# will be chunked by the data it matches up with
-		# ie) each match returned by scan will be one set which matches the requested buttons
-		string_buffer.scan(search_regex) do |event_time_deltas|
-			# match up found deltas with expected deltas
-			# check exact, or within certain margins, whatever you need
-			# (depends on input type (simple / complex, and which complex one))
-		end
-		
-		
-		
-		
-		
+		# search string version of input buffer with regex to collect all key press timestamps
+		# based on the button inputs supplied to this method
 		
 		
 		# The following regex all assumes that the button up / down events
 		# will be represented in string form as the Unicode up/down arrows
 		data_regex_string = '.*?[↑|↓]'
 		
+		# Format the given button inputs as a search query
 		search_query = inputs.collect do |query_input|
 			data = query_input.to_s.scan(/(#{data_regex_string})\d*/).first
 			
@@ -196,18 +163,24 @@ class InputBuffer
 		
 		@buffer.to_s.scan(query_regex) do |event_time_deltas|
 			# match up found deltas with expected deltas
-			raise inputs.size != event_time_deltas.size # should totally be the same
+			raise "Somehow regex matched against sequence of different size." if inputs.size != event_time_deltas.size # should totally be the same
 			
 			
 			inputs.each_index do |i|
+				# match DTs need to be adjusted relative to the first dt in the match
+				# expected DTs are given relative to dt=0 being the first button press
+				match_dt = event_time_deltas[i] - event_time_deltas.first
 				expected_dt = inputs[i].dt
-				match_dt = event_time_deltas[i]
 				
 				# check exact, or within certain margins, whatever you need
 				# (depends on input type (simple / complex, and which complex one))
 				
 				
+				
+				
 				# MAYBE JUST YIELD HERE? IDK o_O;
+				
+				# probably break out of loop when it's clear that the time deltas are weird
 			end
 		end
 		
