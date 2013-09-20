@@ -1,6 +1,10 @@
+# encoding: utf-8
+
 # Queues up items, discarding the oldest item when the size is reached
 
 class RingBuffer
+	include Enumerable
+	
 	# add new elements to the back of the line
 	# walk from the front to the back
 	
@@ -10,6 +14,38 @@ class RingBuffer
 		@tail_index = @head_index
 		
 		@size = 0
+	end
+	
+	def [](index)
+		# returns nil if index >= @size
+		# does work with negative indexes as in Array though
+		counter = wrapping_counter @head_index, @tail_index, @queue.size
+		i = counter[index]
+		if i
+			return @queue[i]
+		else
+			return nil
+		end
+		
+		
+		# # wraps around the entire buffer (including empty slots)
+		# # would have to at least modify so that it only iterates over filled slots
+		# i = @head_index + index
+		# i %= @queue.size if i >= @queue.size
+		
+		# return @queue[i]
+	end
+	
+	# Comma separated list of inputs
+	def to_s
+		out = ""
+		
+		self.each do |i|
+			out << i.to_s
+			out << ','
+		end
+		
+		return out
 	end
 	
 	def clear

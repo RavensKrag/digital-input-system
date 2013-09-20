@@ -22,4 +22,15 @@ trial 1:
 
 
 
+tap
+	down
+hold
+	down -- (interval) -- up
+	
+	check that interval exceeds expected threshold
+	anything could happen in the interval
+sequence
+	
+
+
 
