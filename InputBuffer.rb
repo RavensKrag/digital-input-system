@@ -25,6 +25,10 @@ class InputBuffer
 	def initialize
 		@buffer = RingBuffer.new 100
 		reset
+		
+		# should be in same units as other time units
+		# assuming milliseconds
+		@input_leniancy = 80
 	end
 	
 	#    ____        __              __ 
@@ -171,16 +175,21 @@ class InputBuffer
 				# expected DTs are given relative to dt=0 being the first button press
 				match_dt = event_time_deltas[i] - event_time_deltas.first
 				expected_dt = inputs[i].dt
+				# ----------------------------------------
 				
-				# check exact, or within certain margins, whatever you need
-				# (depends on input type (simple / complex, and which complex one))
-				
-				
-				
-				
-				# MAYBE JUST YIELD HERE? IDK o_O;
-				
-				# probably break out of loop when it's clear that the time deltas are weird
+				if match_dt.between? expected_dt, expected_dt+@input_leniancy
+					# within input window
+					
+					# MAYBE JUST YIELD HERE? IDK o_O;
+					
+					
+				else
+					# outside input window
+					
+					# probably break out of loop when it's clear that the time deltas are weird
+					break
+				end
+				# ----------------------------------------
 			end
 		end
 		
