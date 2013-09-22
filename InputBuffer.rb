@@ -166,8 +166,12 @@ class InputBuffer
 		
 		
 		match_timestamps = @buffer.to_s.scan(query_regex).collect do |event_timestamps|
+			# NOTE: Assuming integer timestamps
+			
 			# match up found deltas with expected deltas
 			raise "Somehow regex matched against sequence of different size." if inputs.size != event_timestamps.size # should totally be the same
+			
+			event_timestamps.collect{ |timestamp| timestamp.to_i} # convert strings
 			
 			# expected DTs are given with dt=0 being the first button press
 			
