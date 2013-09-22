@@ -162,43 +162,32 @@ class InputBuffer
 			data+'(\d*)' +'[,#{data_regex_string}[\d*],]*'
 		end
 		
-		# query_string = search_query.join
-		# query_regex = Regex.new query_string
 		query_regex = Regex.new search_query.join
 		
-		@buffer.to_s.scan(query_regex) do |event_timestamps|
+		
+		match_timestamps = @buffer.to_s.scan(query_regex).collect do |event_timestamps|
 			# match up found deltas with expected deltas
 			raise "Somehow regex matched against sequence of different size." if inputs.size != event_timestamps.size # should totally be the same
 			
+			# expected DTs are given with dt=0 being the first button press
 			
-			match_successful = (0..(inputs.size-1)).all? do |i|
-				# match DTs need to be adjusted relative to the first dt in the match
-				# expected DTs are given relative to dt=0 being the first button press
-				match_dt = event_timestamps[i] - event_timestamps.first
-				expected_dt = inputs[i].dt
-				
-				
+			
+			match_dts = event_timestamps.collect{|timestamp| timestamp - event_timestamps.first}
+			expected_dts = inputs.collect{|i| i.dt}
+			
+			match_successful = match_dts.zip(expected_dts).all? do |match_dt, expected_dt|
 				match_dt.between? expected_dt, expected_dt+@input_leniancy
 			end
 			
-			if match_successful
-				# Fire button event? I guess?
-				# this same search can be used to check for both up and down events though
-				# so just return "true", and process the specifics later
-				
-				# store all timestamps of final presses into a array to be returned at the end
-				match_timestamps << event_timestamps.last
-				break
-			end
+			
+			event_timestamps.last if match_successful
 		end
 		
 		
+		match_timestamps.compact!
+		match_timestamps = nil if match_timestamps.empty?
 		
-		if match_timestamps.empty?
-			return nil
-		else
-			return match_timestamps
-		end
+		return match_timestamps
 	end
 	
 	
