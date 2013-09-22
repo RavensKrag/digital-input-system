@@ -119,3 +119,20 @@ chord
 above sequences seem pretty easy to create a nice clean interface for
 the "sequence" type is different though,
 because the whole point is being able to list specific times between button presses
+
+
+how do you find a down event?
+	find the sequences needed to trigger the even
+but when you want to fight an up event
+	you need to look for both the down and the up sequences back to back
+	
+	NO
+	
+	if you do that, then holding down a sequence, and then hitting bunch of other keys
+		which would clease a large chunk of the buffer
+	would prevent detecting of an up event
+
+
+maybe the sequence requested to be searched by the event tracker should change
+from the button down sequence to the button up sequence
+depending on the state of the event tracker?
