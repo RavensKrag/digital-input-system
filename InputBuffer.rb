@@ -142,6 +142,7 @@ class InputBuffer
 	def search(*inputs)
 		# search string version of input buffer with regex to collect all key press timestamps
 		# based on the button inputs supplied to this method
+		match_timestamps = Array.new # output
 		
 		
 		# The following regex all assumes that the button up / down events
@@ -165,15 +166,15 @@ class InputBuffer
 		# query_regex = Regex.new query_string
 		query_regex = Regex.new search_query.join
 		
-		@buffer.to_s.scan(query_regex) do |event_time_deltas|
+		@buffer.to_s.scan(query_regex) do |event_timestamps|
 			# match up found deltas with expected deltas
-			raise "Somehow regex matched against sequence of different size." if inputs.size != event_time_deltas.size # should totally be the same
+			raise "Somehow regex matched against sequence of different size." if inputs.size != event_timestamps.size # should totally be the same
 			
 			
 			match_successful = (0..(inputs.size-1)).all? do |i|
 				# match DTs need to be adjusted relative to the first dt in the match
 				# expected DTs are given relative to dt=0 being the first button press
-				match_dt = event_time_deltas[i] - event_time_deltas.first
+				match_dt = event_timestamps[i] - event_timestamps.first
 				expected_dt = inputs[i].dt
 				
 				
@@ -184,8 +185,19 @@ class InputBuffer
 				# Fire button event? I guess?
 				# this same search can be used to check for both up and down events though
 				# so just return "true", and process the specifics later
-				return true
+				
+				# store all timestamps of final presses into a array to be returned at the end
+				match_timestamps << event_timestamps.last
+				break
 			end
+		end
+		
+		
+		
+		if match_timestamps.empty?
+			return nil
+		else
+			return match_timestamps
 		end
 	end
 	
