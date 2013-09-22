@@ -159,7 +159,8 @@ class InputBuffer
 			# might be some other inputs in the middle (don't care about those)
 			# all inputs are separated with commas
 			# TODO: Remove blob to detect middle inputs if possible. Would make the main query regex cleaner, and would also allow for making the input scan regex constant.
-			data+'(\d*)' +'[,#{data_regex_string}[\d*],]*'
+			data+'(\d*)' + '[,'+data_regex_string+'][\d*],]*'
+			# data+'(\d*)' + ',.*?'
 		end
 		
 		query_regex = Regex.new search_query.join
