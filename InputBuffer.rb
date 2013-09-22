@@ -22,8 +22,8 @@ class InputBuffer
 	end
 	
 	
-	def initialize
-		@buffer = RingBuffer.new 100
+	def initialize(size=100)
+		@buffer = RingBuffer.new size # buffered input stream
 		reset
 		
 		# should be in same units as other time units
