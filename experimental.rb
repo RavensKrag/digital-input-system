@@ -4,6 +4,12 @@
 class Window
 	def initialize
 		@input_manager = InputManager.new
+		
+		@input_manager.event :dive_attack do
+			bind_to [:down, :b]
+			
+			
+		end
 	end
 	
 	def update
