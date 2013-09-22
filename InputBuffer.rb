@@ -171,16 +171,14 @@ class InputBuffer
 			
 			# expected DTs are given with dt=0 being the first button press
 			
+			match_dts = event_timestamps.collect{ |timestamp| timestamp - event_timestamps.first}
+			expected_dts = inputs.collect{ |i| i.dt}
 			
-			match_dts = event_timestamps.collect{|timestamp| timestamp - event_timestamps.first}
-			expected_dts = inputs.collect{|i| i.dt}
 			
-			match_successful = match_dts.zip(expected_dts).all? do |match_dt, expected_dt|
-				match_dt.between? expected_dt, expected_dt+@input_leniancy
+			deltas = match_dts.zip(expected_dts)
+			if deltas.all?{ |match, expected| match.between? expected, expected+@input_leniancy }
+				event_timestamps.last
 			end
-			
-			
-			event_timestamps.last if match_successful
 		end
 		
 		
