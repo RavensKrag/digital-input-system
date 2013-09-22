@@ -173,12 +173,12 @@ class InputBuffer
 			# match up found deltas with expected deltas
 			raise "Somehow regex matched against sequence of different size." if inputs.size != event_timestamps.size # should totally be the same
 			
-			event_timestamps.collect!{ |timestamp| timestamp.to_i} # convert strings
+			event_timestamps.collect!{ |timestamp| timestamp.to_i } # convert strings
 			
 			# expected DTs are given with dt=0 being the first button press
 			
-			match_dts = event_timestamps.collect{ |timestamp| timestamp - event_timestamps.first}
-			expected_dts = inputs.collect{ |i| i.dt}
+			match_dts = event_timestamps.collect{ |timestamp| timestamp - event_timestamps.first }
+			expected_dts = inputs.collect{ |i| i.dt }
 			
 			
 			deltas = match_dts.zip(expected_dts)
