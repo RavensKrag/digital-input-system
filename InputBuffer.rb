@@ -170,29 +170,23 @@ class InputBuffer
 			raise "Somehow regex matched against sequence of different size." if inputs.size != event_time_deltas.size # should totally be the same
 			
 			
-			inputs.each_index do |i|
+			match_successful = (0..(inputs.size-1)).all? do |i|
 				# match DTs need to be adjusted relative to the first dt in the match
 				# expected DTs are given relative to dt=0 being the first button press
 				match_dt = event_time_deltas[i] - event_time_deltas.first
 				expected_dt = inputs[i].dt
-				# ----------------------------------------
 				
-				if match_dt.between? expected_dt, expected_dt+@input_leniancy
-					# within input window
-					
-					# MAYBE JUST YIELD HERE? IDK o_O;
-					
-					
-				else
-					# outside input window
-					
-					# probably break out of loop when it's clear that the time deltas are weird
-					break
-				end
-				# ----------------------------------------
+				
+				match_dt.between? expected_dt, expected_dt+@input_leniancy
+			end
+			
+			if match_successful
+				# Fire button event? I guess?
+				# this same search can be used to check for both up and down events though
+				# so just return "true", and process the specifics later
+				return true
 			end
 		end
-		
 	end
 	
 	
