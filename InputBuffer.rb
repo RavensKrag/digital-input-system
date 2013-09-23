@@ -96,13 +96,11 @@ class InputBuffer
 	def button_down(id)
 		@start_time = timestamp if @buffer.empty?
 		
-		char = $window.button_id_to_char(id)
-		@buffer.queue Event.new(char, :down, dt) if char
+		@buffer.queue Event.new(id, :down, dt)
 	end
 	
 	def button_up(id)
-		char = $window.button_id_to_char(id)
-		@buffer.queue Event.new(char, :up, dt) if char
+		@buffer.queue Event.new(id, :up, dt)
 	end
 	
 	def reset
