@@ -4,6 +4,8 @@
 require './InputBuffer'
 
 class InputManager
+	attr_accessor :input_leniency
+	
 	def initialize
 		# 
 		# search for actions by input sequence match?
@@ -11,11 +13,9 @@ class InputManager
 		
 		
 		@buffer = InputBuffer.new 100
-		
+		@input_leniency = 80 # milliseconds
 		
 		@sequences = [] # list of input sequences, sorted from complex to simplistic
-		
-		
 	end
 	
 	def add(sequence)
@@ -57,7 +57,7 @@ class InputManager
 				
 				next unless event_sequence
 				
-				timestamps = @input_buffer.search event_sequence
+				timestamps = @input_buffer.search event_sequence, @input_leniency
 				timestamps.each do |time|
 					# TODO: Set up state machine so events only trigger when appropriate / sensible
 					s.send(input) if recent?(time)
