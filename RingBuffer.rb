@@ -8,6 +8,8 @@ class RingBuffer
 	# add new elements to the back of the line
 	# walk from the front to the back
 	
+	attr_reader :size
+	
 	def initialize(size)
 		@queue = Array.new(size)
 		@head_index = 0
@@ -49,7 +51,7 @@ class RingBuffer
 	end
 	
 	def clear
-		@queue.clear
+		@queue = Array.new @queue.size # TODO: find a way to optimize this (clear doesn't work)
 		@head_index = 0
 		@tail_index = @head_index
 		
@@ -104,11 +106,24 @@ class RingBuffer
 	
 	# add items to the back of the queue
 	def queue(*items)
+		# insert @ tail
+		# increment size (if able)
+		# check size
+			# move head if necessary
+		# move tail
+		
 		items.each do |i|
+			# puts "head #{@head_index}  tail #{@tail_index}"
+			
 			@queue[@tail_index] = i
+			
+			@size += 1 unless @size == @queue.size
+			
+			if @size == @queue.size
+				advance_head
+			end
+			
 			advance_tail
-			
-			
 		end
 	end
 	
@@ -148,23 +163,20 @@ class RingBuffer
 	private
 	
 	
+	# Exclude the tail, because the tail is always an open slot,
+	# thus, there will be no valid data there
 	def wrapping_counter(head, tail, size, &block)
 		# size is the size of the entire container, not the interval between head and tail
 		raise "Head out of range" if head >= size or head < 0
 		raise "Tail out of range" if tail >= size or tail < 0
-		
-		return if size == 0
-		return if head == tail # traversal range is zero
 		
 		out = Array.new unless block # if there is no block, return a list a numbers
 		
 		
 		i = head
 		
-		final = tail+1
-		final = 0 if final == size
-		begin # can't just say "< tail" because of wrap around
-			
+		final = tail
+		while(i != final)  # can't just say "< tail" because of wrap around
 			if block
 				block.call i 
 			else
@@ -173,7 +185,7 @@ class RingBuffer
 			
 			i += 1
 			i = 0 if i == size
-		end while(i != final) 
+		end 
 		
 		return out unless block # <- only return list if there isn't a block
 	end
@@ -197,18 +209,6 @@ class RingBuffer
 	
 	# Move tail to the next position. Don't forget to wrap around.
 	def advance_tail
-		# circular overwrite
-		if @size == @queue.size
-			# buffer is at full capacity
-			# tail should be right up against the head at this point
-			# the only way new elements can come in, is if old ones are expired
-			# so move the head (which points to the oldest element) forward to make space
-			advance_head
-		else
-			@size += 1
-		end
-		
-		# move index
 		@tail_index += 1
 		@tail_index = 0 if @tail_index == @queue.size
 	end
