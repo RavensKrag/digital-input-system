@@ -26,9 +26,13 @@ class Window < Gosu::Window
 		width = 800
 		fullscreen = false
 		
-		update_interval = 1/60.0
+		update_interval = 1/60.0*1000
 		
 		super(width, height, fullscreen, update_interval)
+		
+		@debug_font = Gosu::Font.new self, "Lucida Sans Unicode", 20
+		
+		
 		
 		@inpman = InputManager.new
 		
@@ -115,6 +119,8 @@ class Window < Gosu::Window
 		translate 50, 50 do
 			# @input_buffer.draw
 		end
+		
+		@debug_font.draw Gosu.fps, 0,0, 1000
 	end
 	
 	def button_down(id)
