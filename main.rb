@@ -34,7 +34,7 @@ class Window < Gosu::Window
 		
 		sequence = Sequence.new :test do
 			on_press do
-				
+				puts "BUTTON DOWN"
 			end
 			
 			on_hold do
@@ -53,19 +53,52 @@ class Window < Gosu::Window
 			Event.new(Gosu::KbA, :down,	0+300*0),
 			Event.new(Gosu::KbA, :up,	200+300*0),
 			
-			Event.new(Gosu::KbO, :down,	0+300*1),
-			Event.new(Gosu::KbO, :up,	200+300*1),
+			Event.new(Gosu::KbS, :down,	0+300*1),
+			Event.new(Gosu::KbS, :up,	200+300*1),
 			
-			Event.new(Gosu::KbE, :down,	0+300*2)
+			Event.new(Gosu::KbD, :down,	0+300*2)
 		]
 
 		# release event timestamps are irrelevant
 		# release event fire when any one of the release events are detected
 		sequence.release_events = [
-			Event.new(Gosu::KbE, :up,	0)
+			Event.new(Gosu::KbD, :up,	0)
+		]
+		
+		
+		
+		chord = Sequence.new :chord do
+			on_press do
+				puts "GOGOGOG!!!! #{Gosu::milliseconds}"
+			end
+			
+			on_hold do
+				puts "GOGOGOG!!!! #{Gosu::milliseconds}"
+			end
+			
+			on_release do
+				# puts "GOGOGOG!!!!"
+			end
+			
+			on_idle do
+				# puts "GOGOGOG!!!!"
+			end
+		end
+		chord.press_events = [
+			Event.new(Gosu::KbA, :down,	0),
+			Event.new(Gosu::KbS, :down,	0),
+			Event.new(Gosu::KbD, :down,	0)
 		]
 
-
+		# release event timestamps are irrelevant
+		# release event fire when any one of the release events are detected
+		chord.release_events = [
+			Event.new(Gosu::KbD, :up,	0)
+		]
+		
+		
+		# @inpman.add sequence
+		@inpman.add chord	
 	end
 	
 	def needs_cursor?
