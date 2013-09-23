@@ -13,7 +13,8 @@ class InputManager
 		@buffer = InputBuffer.new 100
 		
 		
-		@events = []
+		@events = [] # list of events, sorted from complex to simplistic
+		
 		
 	end
 	
@@ -36,8 +37,7 @@ class InputManager
 		
 		
 		# separate button down / up triggers
-		events = Array.new # list of events, sorted by complex to simplistic
-		events.each do |event|
+		@events.each do |event|
 			[:press, :release].each do |type|
 				@input_buffer.search event.send("#{type}_trigger") do |time|
 					# TODO: Set up state machine so events only trigger when appropriate / sensible
@@ -50,8 +50,7 @@ class InputManager
 		
 		
 		# search always returns array instead of sometimes having a block
-		events = Array.new # list of events, sorted by complex to simplistic
-		events.each do |event|
+		@events.each do |event|
 			[:press, :release].each do |type|
 				timestamps = @input_buffer.search event.send("#{type}_trigger")
 				timestamps.each do |time|
