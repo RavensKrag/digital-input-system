@@ -24,9 +24,6 @@ class InputManager
 	end
 	
 	def update
-		# @buffer.update
-		
-		
 		@sequences.each do |s|
 			s.update
 		end
@@ -48,42 +45,26 @@ class InputManager
 		# 	but technically sequences have more inputs (count ups and downs)
 	end
 	
-	def button_down(id)
-		@buffer.button_down id
-		
-		# look for button down transitions
-		# even sequences should go here, because they end on a down
-		# you're certainly not going to start a sequence detect on an up
-			# there might be some weird thing you want to do where something triggers on up
-			# but that should be classified as a release callback
-		@sequences.each do |s|
-			event_sequence = s.press_events
-			
-			next unless event_sequence
-			
-			timestamps = @input_buffer.search event_sequence
-			timestamps.each do |time|
-				# TODO: Set up state machine so events only trigger when appropriate / sensible
-				s.press if recent?(time)
-			end
-		end
-	end
 	
-	def button_up(id)
-		@buffer.button_up id
+	[[:down, :press], [:up, :release]].each do |direction, input|
+		button_direction = "button_#{direction}"
 		
-		# look for button up transitions
-		@sequences.each do |s|
-			event_sequence = s.release_events
+		define_method button_direction do |id|
+			@buffer.send button_direction, id
 			
-			next unless event_sequence
-			
-			timestamps = @input_buffer.search event_sequence
-			timestamps.each do |time|
-				# TODO: Set up state machine so events only trigger when appropriate / sensible
-				s.release if recent?(time)
+			@sequences.each do |s|
+				event_sequence = s.send("#{input}_events")
+				
+				next unless event_sequence
+				
+				timestamps = @input_buffer.search event_sequence
+				timestamps.each do |time|
+					# TODO: Set up state machine so events only trigger when appropriate / sensible
+					s.send(input) if recent?(time)
+				end
 			end
 		end
+		
 	end
 	
 	
