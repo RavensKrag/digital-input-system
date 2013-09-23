@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # Find strings of button presses that match certain patterns,
 # and fire associated events
 
@@ -21,6 +23,11 @@ class InputManager
 	def add(sequence)
 		# TODO: Properly insert into sorted structure
 		@sequences << sequence
+		@sequences.sort!
+	end
+	
+	def reset
+		@buffer.reset
 	end
 	
 	def update

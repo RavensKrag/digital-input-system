@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 class Event
 	attr_reader :input, :timestamp
 	

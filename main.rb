@@ -11,8 +11,12 @@ require 'require_all'
 
 require 'state_machine'
 
-
+require './InputManager'
 require './InputBuffer'
+	require './RingBuffer'
+require './Sequence'
+require './Event'
+require './Input'
 
 class Window < Gosu::Window
 	def initialize
@@ -26,7 +30,42 @@ class Window < Gosu::Window
 		
 		super(width, height, fullscreen, update_interval)
 		
-		@input_buffer = InputBuffer.new
+		@inpman = InputManager.new
+		
+		sequence = Sequence.new :test do
+			on_press do
+				
+			end
+			
+			on_hold do
+				
+			end
+			
+			on_release do
+				
+			end
+			
+			on_idle do
+				
+			end
+		end
+		sequence.press_events = [
+			Event.new(Gosu::KbA, :down,	0+300*0),
+			Event.new(Gosu::KbA, :up,	200+300*0),
+			
+			Event.new(Gosu::KbO, :down,	0+300*1),
+			Event.new(Gosu::KbO, :up,	200+300*1),
+			
+			Event.new(Gosu::KbE, :down,	0+300*2)
+		]
+
+		# release event timestamps are irrelevant
+		# release event fire when any one of the release events are detected
+		sequence.release_events = [
+			Event.new(Gosu::KbE, :up,	0)
+		]
+
+
 	end
 	
 	def needs_cursor?
@@ -34,7 +73,7 @@ class Window < Gosu::Window
 	end
 	
 	def update
-		
+		@inpman.update
 	end
 	
 	def draw
@@ -48,9 +87,9 @@ class Window < Gosu::Window
 		
 		case id
 			when Gosu::KbReturn
-				@input_buffer.reset
+				@inpman.reset
 			else
-				@input_buffer.button_down id
+				@inpman.button_down id
 		end
 	end
 	
@@ -59,7 +98,7 @@ class Window < Gosu::Window
 			when Gosu::KbReturn
 				
 			else
-				@input_buffer.button_up id
+				@inpman.button_up id
 		end
 	end
 	

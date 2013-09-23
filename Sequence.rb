@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # Manage what strings of inputs to look for,
 # what do do when those strings are found,
 # and the current state of high-level input.
@@ -6,12 +8,18 @@ require 'rubygems'
 require 'state_machine'
 
 class Sequence
+	include Comparable
+	
 	CALLBACK_NAMES = [:on_press, :on_hold, :on_release, :on_idle]
 	
 	NULL_CALLBACK = Proc.new {|o| }
 	
-	def initialize(&block)
+	attr_reader :name
+	
+	def initialize(name, &block)
 		super()
+		
+		@name = name 
 		
 		# triggers for up and down events
 		@press_events = Array.new
@@ -24,6 +32,13 @@ class Sequence
 		
 		instance_eval &block
 	end
+	
+	def <=>(other)
+		return super(other) unless other.is_a? self.class
+		
+		@press_events.count <=> other.press_events.count
+	end
+	
 	
 	#     ______                 __     __    _      __ 
 	#    / ____/   _____  ____  / /_   / /   (_)____/ /_
@@ -42,11 +57,10 @@ class Sequence
 	# Definition only.  Execution is only ever handled internally
 	
 	CALLBACK_NAMES.each do |callback_name|
-		private callback_name
-		
 		define_method callback_name do |&block|
 			@callbacks[callback_name] = block
 		end
+		private callback_name
 	end
 	
 	
