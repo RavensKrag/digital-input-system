@@ -108,19 +108,20 @@ class Sequence
 	
 	
 	def idle_callback
-		instance_eval &@callbacks[:on_idle] if enabled?
+		instance_eval &@callbacks[:on_idle]
 	end
 	
 	def hold_callback
 		# TODO: give hold duration to the block
-		instance_eval &@callbacks[:on_hold] if enabled?
+		instance_eval &@callbacks[:on_hold]
 	end
 	
 	def press_callback
-		instance_eval &@callbacks[:on_press] if enabled?
+		puts "press"
+		instance_eval &@callbacks[:on_press]
 	end
 	
 	def release_callback
-		instance_eval &@callbacks[:on_release] if enabled?
+		instance_eval &@callbacks[:on_release]
 	end
 end
