@@ -139,7 +139,7 @@ class InputBuffer
 	
 	
 	# search through the input buffer for something that matches the supplied input sequence
-	def search(*inputs)
+	def search(inputs)
 		# search string version of input buffer with regex to collect all key press timestamps
 		# based on the button inputs supplied to this method
 		match_timestamps = Array.new # output

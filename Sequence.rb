@@ -55,7 +55,7 @@ class Sequence
 	#   \__ \/ __/ __ `/ __/ _ \
 	#  ___/ / /_/ /_/ / /_/  __/
 	# /____/\__/\__,_/\__/\___/ 
-	                          
+	# (Contains update)
 	
 	state_machine :status, :initial => :idle do
 		state :idle do

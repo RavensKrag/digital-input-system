@@ -13,53 +13,23 @@ class InputManager
 		@buffer = InputBuffer.new 100
 		
 		
-		@events = [] # list of events, sorted from complex to simplistic
+		@sequences = [] # list of input sequences, sorted from complex to simplistic
 		
 		
 	end
 	
+	def add(sequence)
+		# TODO: Properly insert into sorted structure
+		@sequences << sequence
+	end
+	
 	def update
-		@buffer.update
+		# @buffer.update
 		
 		
-		
-		
-		
-		# establish some callbacks, such that when the inputs are detected in the buffer,
-		# they can be dealt with
-		falling_stab = [Gosu::KbDown, Gosu::KbB]
-		
-		if @input_buffer.search falling_stab
-			# perform some action
+		@sequences.each do |s|
+			s.update
 		end
-		
-		
-		
-		
-		# separate button down / up triggers
-		@events.each do |event|
-			[:press, :release].each do |type|
-				@input_buffer.search event.send("#{type}_trigger") do |time|
-					# TODO: Set up state machine so events only trigger when appropriate / sensible
-					event.send "#{type}_event" if recent?(time)
-				end
-			end
-		end
-		
-		
-		
-		
-		# search always returns array instead of sometimes having a block
-		@events.each do |event|
-			[:press, :release].each do |type|
-				timestamps = @input_buffer.search event.send("#{type}_trigger")
-				timestamps.each do |time|
-					# TODO: Set up state machine so events only trigger when appropriate / sensible
-					event.send "#{type}_event" if recent?(time)
-				end
-			end
-		end
-		
 		
 		
 		# ==========	CRITICAL		==========
@@ -80,9 +50,72 @@ class InputManager
 	
 	def button_down(id)
 		@buffer.button_down id
+		
+		# look for button down transitions
+		# even sequences should go here, because they end on a down
+		# you're certainly not going to start a sequence detect on an up
+			# there might be some weird thing you want to do where something triggers on up
+			# but that should be classified as a release callback
+		@sequences.each do |s|
+			event_sequence = s.press_events
+			
+			next unless event_sequence
+			
+			timestamps = @input_buffer.search event_sequence
+			timestamps.each do |time|
+				# TODO: Set up state machine so events only trigger when appropriate / sensible
+				s.press if recent?(time)
+			end
+		end
 	end
 	
 	def button_up(id)
 		@buffer.button_up id
+		
+		# look for button up transitions
+		@sequences.each do |s|
+			event_sequence = s.release_events
+			
+			next unless event_sequence
+			
+			timestamps = @input_buffer.search event_sequence
+			timestamps.each do |time|
+				# TODO: Set up state machine so events only trigger when appropriate / sensible
+				s.release if recent?(time)
+			end
+		end
 	end
+	
+	
+	
+	#    __  _              
+	#   / /_(_)___ ___  ___ 
+	#  / __/ / __ `__ \/ _ \
+	# / /_/ / / / / / /  __/
+	# \__/_/_/ /_/ /_/\___/ 
+	
+	def timestamp
+		Gosu::milliseconds
+	end
+	
+	def dt
+		timestamp - @start_time
+	end
+	
+	private
+	
+	def recent?(time)
+		# dt determines the window
+		# dt varies with update rate
+		# at the very least, inputs are recent if they were entered
+		# within the last few frames or so
+		# but real wall clock time is also important
+		dt = 0
+		
+		now = timestamp
+		before = now - dt
+		
+		time.between? before, now
+	end
+	
 end
