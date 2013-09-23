@@ -3,17 +3,12 @@
 require './RingBuffer'
 
 class InputBuffer
+	DEFAULT_LENIANCY = 80	# should be in same units as other time units
+							# assuming milliseconds
+	
 	def initialize(size=100)
 		@buffer = RingBuffer.new size # buffered input stream
 		reset
-		
-		# should be in same units as other time units
-		# assuming milliseconds
-		@input_leniancy = 80
-		
-		
-		
-		@inputs = Array.new # collection of input sequences to be search for
 	end
 	
 	#    ____        __              __ 
@@ -124,7 +119,7 @@ class InputBuffer
 	
 	
 	# search through the input buffer for something that matches the supplied input sequence
-	def search(inputs)
+	def search(inputs, input_leniancy=DEFAULT_LENIANCY)
 		# search string version of input buffer with regex to collect all key press timestamps
 		# based on the button inputs supplied to this method
 		
@@ -165,7 +160,7 @@ class InputBuffer
 			
 			
 			times = match_times.zip(expected_times)
-			if times.all?{ |match, expected| match.between? expected, expected+@input_leniancy }
+			if times.all?{ |match, expected| match.between? expected, expected+input_leniancy }
 				out << event_timestamps.last
 			end
 		end
