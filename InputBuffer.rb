@@ -2,6 +2,14 @@
 
 require './RingBuffer'
 
+class Regexp
+  def +(r)
+    Regexp.new(source + r.source)
+  end
+end
+
+
+
 class InputBuffer
 	DEFAULT_LENIANCY = 80	# should be in same units as other time units
 							# assuming milliseconds
@@ -123,7 +131,7 @@ class InputBuffer
 		
 		
 		# Format the given button inputs as a search query
-		search_query = inputs.collect do |query_event|
+		# search_query = inputs.collect do |query_event|
 			# look for the exact data match,
 			# CAPTURE the number which follows,
 			# 
@@ -133,17 +141,18 @@ class InputBuffer
 			
 			# The following regex all assumes that the button up / down events
 			# will be represented in string form as the Unicode up/down arrows
-			query_event.input.to_s+'(\d*)' + '[,.*?[↑|↓]][\d*],]*'
-		end
+			# query_event.input.to_s+'(\d*)' + '[,.*?[↑|↓]][\d*],]*'
+		# end
 		
 		# NOTE: Following regex may be wonky on the comma detection
-		# search_query = inputs.collect{ |query_event| query_event.input.to_s+'(\d*)' + ',.*?' } 
+		# NOTE: Regex currently doesn't care if you try ↓↑ ↓↑ ↓↑, for 3 button chord, because it sees the 3 downs in a row with some stuff in the middle
+		search_query = inputs.collect do |query_event|
+			 /#{query_event.input.to_s}(\d*)/ + /[,.*?[↑|↓][\d*],]*?/
+		end
 		
-		query_regex = Regex.new search_query.join
-		
+		query_regex = search_query.inject(//){|out, i| out + i}
 		
 		match_timestamps = Array.new
-		
 		@buffer.to_s.scan(query_regex).inject(match_timestamps) do |out, event_timestamps|
 			# match up found deltas with expected deltas
 			raise "Somehow regex matched against sequence of different size." if inputs.size != event_timestamps.size # should totally be the same
@@ -162,8 +171,6 @@ class InputBuffer
 				out << event_timestamps.last
 			end
 		end
-		
-		match_timestamps = nil if match_timestamps.empty?
 		
 		return match_timestamps
 	end
