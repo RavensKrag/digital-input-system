@@ -3,25 +3,6 @@
 require './RingBuffer'
 
 class InputBuffer
-	Input = Struct.new :key, :direction, :dt do
-		def to_s
-			out = ""
-			out << self.key.to_s
-			
-			out << case self.direction
-				when :up
-					"↑"
-				when :down
-					"↓"
-			end
-			
-			out << self.dt.to_s
-			
-			return out
-		end
-	end
-	
-	
 	def initialize(size=100)
 		@buffer = RingBuffer.new size # buffered input stream
 		reset
@@ -29,6 +10,10 @@ class InputBuffer
 		# should be in same units as other time units
 		# assuming milliseconds
 		@input_leniancy = 80
+		
+		
+		
+		@inputs = Array.new # collection of input sequences to be search for
 	end
 	
 	#    ____        __              __ 
@@ -142,26 +127,24 @@ class InputBuffer
 	def search(inputs)
 		# search string version of input buffer with regex to collect all key press timestamps
 		# based on the button inputs supplied to this method
-		match_timestamps = Array.new # output
 		
-		
-		# The following regex all assumes that the button up / down events
-		# will be represented in string form as the Unicode up/down arrows
-		data_regex_string = '.*?[↑|↓]'
 		
 		# Format the given button inputs as a search query
-		search_query = inputs.collect do |query_input|
-			data = query_input.to_s.scan(/(#{data_regex_string})\d*/).first
-			
+		search_query = inputs.collect do |query_event|
 			# look for the exact data match,
 			# CAPTURE the number which follows,
 			# 
 			# might be some other inputs in the middle (don't care about those)
 			# all inputs are separated with commas
 			# TODO: Remove blob to detect middle inputs if possible. Would make the main query regex cleaner, and would also allow for making the input scan regex constant.
-			data+'(\d*)' + '[,'+data_regex_string+'][\d*],]*'
-			# data+'(\d*)' + ',.*?'
+			
+			# The following regex all assumes that the button up / down events
+			# will be represented in string form as the Unicode up/down arrows
+			query_event.input.to_s+'(\d*)' + '[,.*?[↑|↓]][\d*],]*'
 		end
+		
+		# NOTE: Following regex may be wonky on the comma detection
+		# search_query = inputs.collect{ |query_event| query_event.input.to_s+'(\d*)' + ',.*?' } 
 		
 		query_regex = Regex.new search_query.join
 		
@@ -169,21 +152,20 @@ class InputBuffer
 		match_timestamps = Array.new
 		
 		@buffer.to_s.scan(query_regex).inject(match_timestamps) do |out, event_timestamps|
-			# NOTE: Assuming integer timestamps
-			
 			# match up found deltas with expected deltas
 			raise "Somehow regex matched against sequence of different size." if inputs.size != event_timestamps.size # should totally be the same
 			
+			# NOTE: Assuming integer timestamps
 			event_timestamps.collect!{ |timestamp| timestamp.to_i } # convert strings
 			
 			# expected DTs are given with dt=0 being the first button press
 			
-			match_dts = event_timestamps.collect{ |timestamp| timestamp - event_timestamps.first }
-			expected_dts = inputs.collect{ |i| i.dt }
+			match_times = event_timestamps.collect{ |t| t - event_timestamps.first }
+			expected_times = inputs.collect{ |i| i.timestamp }
 			
 			
-			deltas = match_dts.zip(expected_dts)
-			if deltas.all?{ |match, expected| match.between? expected, expected+@input_leniancy }
+			times = match_times.zip(expected_times)
+			if times.all?{ |match, expected| match.between? expected, expected+@input_leniancy }
 				out << event_timestamps.last
 			end
 		end
