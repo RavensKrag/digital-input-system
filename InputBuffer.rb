@@ -152,8 +152,9 @@ class InputBuffer
 		
 		query_regex = search_query.inject(//){|out, i| out + i}
 		
-		match_timestamps = Array.new
-		@buffer.to_s.scan(query_regex).inject(match_timestamps) do |out, event_timestamps|
+		
+		match = @buffer.to_s.scan(query_regex)
+		match_timestamps = match.inject(Array.new) do |out, event_timestamps|
 			# match up found deltas with expected deltas
 			raise "Somehow regex matched against sequence of different size." if inputs.size != event_timestamps.size # should totally be the same
 			
@@ -170,6 +171,9 @@ class InputBuffer
 			if times.all?{ |match, expected| match.between? expected, expected+input_leniancy }
 				out << event_timestamps.last
 			end
+			
+			# return the output array for the next iteration
+			out
 		end
 		
 		return match_timestamps
