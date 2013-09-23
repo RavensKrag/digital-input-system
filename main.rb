@@ -66,7 +66,9 @@ class Window < Gosu::Window
 		]
 		
 		
-		
+		# ERROR: false negative on reverse roll -> chord
+		# ex) roll(c,b,a) -> chord(a,b,c) -> chord(a,b,c)
+		# 		first chord not detected, but second chord is
 		chord = Sequence.new :chord do
 			on_press do
 				puts "GOGOGOG!!!! #{Gosu::milliseconds}"

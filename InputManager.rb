@@ -64,10 +64,9 @@ class InputManager
 				
 				next unless event_sequence
 				
-				timestamps = @buffer.search event_sequence, @input_leniency
-				timestamps.each do |time|
+				@buffer.search event_sequence, @input_leniency do |timestamp|
 					# TODO: Set up state machine so events only trigger when appropriate / sensible
-					s.send(input) if recent?(time)
+					s.send(input) if recent?(timestamp)
 				end
 			end
 		end
@@ -98,6 +97,8 @@ class InputManager
 		# at the very least, inputs are recent if they were entered
 		# within the last few frames or so
 		# but real wall clock time is also important
+		
+		# TODO: tweak dt
 		dt = 1000
 		
 		now = timestamp

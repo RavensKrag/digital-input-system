@@ -125,27 +125,25 @@ class InputBuffer
 	
 	
 	# search through the input buffer for something that matches the supplied input sequence
-	def search(inputs, input_leniancy=DEFAULT_LENIANCY)
+	def search(inputs, input_leniancy=DEFAULT_LENIANCY, iteration_direction=:forward)
 		# search string version of input buffer with regex to collect all key press timestamps
 		# based on the button inputs supplied to this method
 		
-		
-		# Format the given button inputs as a search query
-		# search_query = inputs.collect do |query_event|
-			# look for the exact data match,
-			# CAPTURE the number which follows,
-			# 
-			# might be some other inputs in the middle (don't care about those)
-			# all inputs are separated with commas
-			# TODO: Remove blob to detect middle inputs if possible. Would make the main query regex cleaner, and would also allow for making the input scan regex constant.
-			
-			# The following regex all assumes that the button up / down events
-			# will be represented in string form as the Unicode up/down arrows
-			# query_event.input.to_s+'(\d*)' + '[,.*?[↑|↓]][\d*],]*'
-		# end
+		iteration_method =	if iteration_direction == :forward
+								:each
+							elsif(
+								iteration_direction == :reverse ||
+								iteration_direction == :backwards
+								)
+								:reverse_each
+							else
+								raise "Improper iteration direction in #{self.class}#search"
+							end
 		
 		# NOTE: Following regex may be wonky on the comma detection
 		# NOTE: Regex currently doesn't care if you try ↓↑ ↓↑ ↓↑, for 3 button chord, because it sees the 3 downs in a row with some stuff in the middle
+		
+		# Format the given button inputs as a search query
 		search_query = inputs.collect do |query_event|
 			 /#{query_event.input.to_s}(\d*)/ + /[,.*?[↑|↓][\d*],]*?/
 		end
@@ -153,8 +151,11 @@ class InputBuffer
 		query_regex = search_query.inject(//){|out, i| out + i}
 		
 		
-		match = @buffer.to_s.scan(query_regex)
-		match_timestamps = match.inject(Array.new) do |out, event_timestamps|
+
+		regex_matches = @buffer.to_s.scan(query_regex)
+		# p "size: #{@buffer.size}  contents: #{@buffer}"
+		# p regex_matches
+		regex_matches.send(iteration_method) do |event_timestamps|
 			# match up found deltas with expected deltas
 			raise "Somehow regex matched against sequence of different size." if inputs.size != event_timestamps.size # should totally be the same
 			
@@ -169,14 +170,9 @@ class InputBuffer
 			
 			times = match_times.zip(expected_times)
 			if times.all?{ |match, expected| match.between? expected, expected+input_leniancy }
-				out << event_timestamps.last
+				yield event_timestamps.last
 			end
-			
-			# return the output array for the next iteration
-			out
 		end
-		
-		return match_timestamps
 	end
 	
 	
