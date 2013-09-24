@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require './RingBuffer'
+require 'DIS/RingBuffer'
 
 class Regexp
   def +(r)

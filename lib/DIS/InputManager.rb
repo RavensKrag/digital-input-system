@@ -3,7 +3,7 @@
 # Find strings of button presses that match certain patterns,
 # and fire associated events
 
-require './InputBuffer'
+require 'DIS/InputBuffer'
 
 module DIS
 	class InputManager

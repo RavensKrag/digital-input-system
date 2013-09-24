@@ -142,9 +142,39 @@ class Window < Gosu::Window
 		]
 		
 		
+		
+		mouse_and_keyboard = DIS::Sequence.new :mouse_and_keyboard do
+			on_press do
+				puts "----CLICK #{Gosu::milliseconds}"
+			end
+			
+			on_hold do
+				puts "----CLICK #{Gosu::milliseconds}"
+			end
+			
+			on_release do
+				puts "nope nope nope"
+			end
+			
+			on_idle do
+				# puts "GOGOGOG!!!!"
+			end
+		end
+		mouse_and_keyboard.press_events = [
+			DIS::Event.new(Gosu::MsLeft, :down, 0),
+			DIS::Event.new(Gosu::KbLeftShift, :down, 0)
+		]
+		
+		mouse_and_keyboard.release_events = [
+			DIS::Event.new(Gosu::MsLeft, :up, 0),
+			# DIS::Event.new(Gosu::KbLeftShift, :up, 0)
+		]
+		
+		
 		# @inpman.add sequence
 		@inpman.add chord
 		@inpman.add single
+		@inpman.add mouse_and_keyboard
 	end
 	
 	def needs_cursor?

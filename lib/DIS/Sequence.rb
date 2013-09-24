@@ -7,6 +7,8 @@
 require 'rubygems'
 require 'state_machine'
 
+require 'DIS/Event'
+
 module DIS
 	class Sequence
 		include Comparable
@@ -31,7 +33,7 @@ module DIS
 				@callbacks[name] = NULL_CALLBACK
 			end
 			
-			instance_eval &block
+			instance_eval &block if block
 		end
 		
 		def <=>(other)

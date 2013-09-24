@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require 'DIS/Input'
+
 module DIS
 	class Event
 		attr_reader :input, :timestamp
