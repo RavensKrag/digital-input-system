@@ -19,6 +19,12 @@ require './Sequence'
 require './Event'
 require './Input'
 
+module DIS
+	def self.timestamp
+		Gosu::milliseconds
+	end
+end
+
 class Window < Gosu::Window
 	def initialize
 		$window = self
