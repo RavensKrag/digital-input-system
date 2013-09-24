@@ -74,9 +74,9 @@ module DIS
 			end
 			
 			candidates.compact!
+			return if candidates.empty?
 			
-			most_complex_candidate = candidates.max_by(&:complexity)
-			most_complex_candidate.press if most_complex_candidate
+			candidates.max_by(&:complexity).press
 		end
 		
 		def button_up(id)
