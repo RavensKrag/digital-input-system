@@ -34,9 +34,9 @@ class Window < Gosu::Window
 		
 		
 		
-		@inpman = InputManager.new
+		@inpman = DIS::InputManager.new
 		
-		sequence = Sequence.new :test do
+		sequence = DIS::Sequence.new :test do
 			on_press do
 				puts "BUTTON DOWN"
 			end
@@ -54,26 +54,26 @@ class Window < Gosu::Window
 			end
 		end
 		sequence.press_events = [
-			Event.new(Gosu::KbA, :down,	0+300*0),
-			Event.new(Gosu::KbA, :up,	200+300*0),
+			DIS::Event.new(Gosu::KbA, :down,	0+300*0),
+			DIS::Event.new(Gosu::KbA, :up,	200+300*0),
 			
-			Event.new(Gosu::KbS, :down,	0+300*1),
-			Event.new(Gosu::KbS, :up,	200+300*1),
+			DIS::Event.new(Gosu::KbS, :down,	0+300*1),
+			DIS::Event.new(Gosu::KbS, :up,	200+300*1),
 			
-			Event.new(Gosu::KbD, :down,	0+300*2)
+			DIS::Event.new(Gosu::KbD, :down,	0+300*2)
 		]
 
 		# release event timestamps are irrelevant
 		# release event fire when any one of the release events are detected
 		sequence.release_events = [
-			Event.new(Gosu::KbD, :up,	0)
+			DIS::Event.new(Gosu::KbD, :up,	0)
 		]
 		
 		
 		# ERROR: false negative on reverse roll -> chord
 		# ex) roll(c,b,a) -> chord(a,b,c) -> chord(a,b,c)
 		# 		first chord not detected, but second chord is
-		chord = Sequence.new :chord do
+		chord = DIS::Sequence.new :chord do
 			on_press do
 				puts "GOGOGOG!!!! #{Gosu::milliseconds}"
 			end
@@ -91,15 +91,15 @@ class Window < Gosu::Window
 			end
 		end
 		chord.press_events = [
-			Event.new(Gosu::KbA, :down,	0),
-			Event.new(Gosu::KbS, :down,	0),
-			Event.new(Gosu::KbD, :down,	0)
+			DIS::Event.new(Gosu::KbA, :down,	0),
+			DIS::Event.new(Gosu::KbS, :down,	0),
+			DIS::Event.new(Gosu::KbD, :down,	0)
 		]
 
 		# release event timestamps are irrelevant
 		# release event fire when any one of the release events are detected
 		chord.release_events = [
-			Event.new(Gosu::KbD, :up,	0)
+			DIS::Event.new(Gosu::KbD, :up,	0)
 		]
 		
 		
