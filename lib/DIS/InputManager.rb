@@ -89,18 +89,6 @@ module DIS
 			end
 		end
 		
-		
-		
-		#    __  _              
-		#   / /_(_)___ ___  ___ 
-		#  / __/ / __ `__ \/ _ \
-		# / /_/ / / / / / /  __/
-		# \__/_/_/ /_/ /_/\___/ 
-		
-		def timestamp
-			Gosu::milliseconds
-		end
-		
 		private
 		
 		def recent?(time)
@@ -117,7 +105,7 @@ module DIS
 			# dt = 360
 			dt = 380
 			
-			# now = timestamp
+			# now = DIS.timestamp
 			# before = now - dt
 			
 			# puts "#{before} < #{time} < #{now}"
@@ -126,8 +114,8 @@ module DIS
 			
 			
 			
-			puts "#{timestamp-time} ~~~ #{dt}"
-			(timestamp-time) < dt
+			puts "#{DIS.timestamp-time} ~~~ #{dt}"
+			(DIS.timestamp-time) < dt
 		end
 		
 	end

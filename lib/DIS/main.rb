@@ -11,6 +11,7 @@ require 'require_all'
 
 require 'state_machine'
 
+require '../DIS'
 require './InputManager'
 require './InputBuffer'
 	require './RingBuffer'

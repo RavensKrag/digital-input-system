@@ -107,7 +107,7 @@ module DIS
 		# and a actual string is going to be used to match
 		# might be better to keep things as strings for most of the process
 		def button_down(id)
-			@start_time = timestamp if @buffer.empty?
+			@start_time = DIS.timestamp if @buffer.empty?
 			
 			@buffer.queue Event.new(id, :down, dt)
 		end
@@ -120,12 +120,8 @@ module DIS
 			@buffer.clear
 		end
 		
-		def timestamp
-			Gosu::milliseconds
-		end
-		
 		def dt
-			timestamp - @start_time
+			DIS.timestamp - @start_time
 		end
 		
 		
