@@ -1,1 +1,2 @@
 TODO: Sequences don't seem to be detected. Not sure if I'm specifying patterns wrong or if the parsing is wrong.  Need to build new tools to visualize that data.
+TODO: May want to investigate event disambiguation. Got an anomoly where both chord and single triggered. Might be leaning on the state machine as one-way valve too much.
