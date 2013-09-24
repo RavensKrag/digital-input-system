@@ -40,14 +40,22 @@ class RingBuffer
 	
 	# Comma separated list of inputs
 	def to_s
-		out = ""
+		# out = ""
 		
-		self.each do |i|
-			out << i.to_s
-			out << ','
-		end
+		# self.each do |i|
+		# 	out << i.to_s
+		# 	out << ','
+		# end
 		
-		return out
+		
+		
+		# self.each do |i|
+		# 	out << "#{i},"
+		# end
+		
+		# return out
+		
+		return self.inject(""){|out, i| out << "#{i},"}
 	end
 	
 	def clear
@@ -68,7 +76,10 @@ class RingBuffer
 	# TODO: Make it so that #each can return an iterator if no block supplied, like in Array#each
 	def each(start=0)
 		counter = wrapping_counter @head_index, @tail_index, @queue.size
-		counter[start..-1].each do |i|
+		
+		counter = counter[start..-1] if start != 0
+		
+		counter.each do |i|
 			yield @queue[i]
 		end
 	end

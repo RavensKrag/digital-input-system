@@ -6,6 +6,11 @@ class Regexp
   def +(r)
     Regexp.new(source + r.source)
   end
+  
+  def self.join(expressions)
+  	# Regexp.new(expressions.inject(""){|out, e| out + e.source} )
+  	Regexp.new(expressions.map{|e| e.source}.join() )
+  end
 end
 
 
@@ -125,54 +130,66 @@ class InputBuffer
 	
 	
 	# search through the input buffer for something that matches the supplied input sequence
-	def search(inputs, input_leniancy=DEFAULT_LENIANCY, iteration_direction=:forward)
+	def search(inputs, input_leniancy=DEFAULT_LENIANCY)
 		# search string version of input buffer with regex to collect all key press timestamps
 		# based on the button inputs supplied to this method
-		
-		iteration_method =	if iteration_direction == :forward
-								:each
-							elsif(
-								iteration_direction == :reverse ||
-								iteration_direction == :backwards
-								)
-								:reverse_each
-							else
-								raise "Improper iteration direction in #{self.class}#search"
-							end
 		
 		# NOTE: Following regex may be wonky on the comma detection
 		# NOTE: Regex currently doesn't care if you try ↓↑ ↓↑ ↓↑, for 3 button chord, because it sees the 3 downs in a row with some stuff in the middle
 		
-		# Format the given button inputs as a search query
+		# Format the given button inputs as a regex query
 		search_query = inputs.collect do |query_event|
-			 /#{query_event.input.to_s}(\d*)/ + /[,.*?[↑|↓][\d*],]*?/
+			/#{query_event.input.to_s}(\d*)/ + /[,.*?[↑|↓][\d*],]*?/ 
+		end
+		query_regex = Regexp.join(search_query)
+		
+		
+		# query_regex = inputs.inject(//) do |out, query_event|
+		# 	out + /#{query_event.input.to_s}(\d*)/ + /[,.*?[↑|↓][\d*],]*?/
+		# end
+		
+		
+		
+		
+		regex_matches = @buffer.to_s.scan(query_regex) # scan from old to recent
+		
+		return nil if regex_matches.size == 0
+		
+		most_recent_match = regex_matches.last
+		
+		most_recent_match.collect!{ |t| t.to_i }
+		
+		
+		
+		match_times = most_recent_match.collect{ |t| t - most_recent_match.first }
+		expected_times = inputs.collect{ |i| i.timestamp }
+		
+		times = match_times.zip(expected_times)
+		if times.all?{ |match, expected| match.between? expected, expected+input_leniancy }
+			return most_recent_match.last # time of final input in sequence
+		else
+			return nil
 		end
 		
-		query_regex = search_query.inject(//){|out, i| out + i}
 		
+		# the following optimization seems to be about the same speed, maybe even a bit slower
+		# certainly much less readable though
 		
-
-		regex_matches = @buffer.to_s.scan(query_regex)
-		# p "size: #{@buffer.size}  contents: #{@buffer}"
-		# p regex_matches
-		regex_matches.send(iteration_method) do |event_timestamps|
-			# match up found deltas with expected deltas
-			raise "Somehow regex matched against sequence of different size." if inputs.size != event_timestamps.size # should totally be the same
+		# inputs.size.times do |i|
+		# 	match = most_recent_match[i] - most_recent_match.first
+		# 	expected = inputs[i].timestamp
 			
-			# NOTE: Assuming integer timestamps
-			event_timestamps.collect!{ |timestamp| timestamp.to_i } # convert strings
-			
-			# expected DTs are given with dt=0 being the first button press
-			
-			match_times = event_timestamps.collect{ |t| t - event_timestamps.first }
-			expected_times = inputs.collect{ |i| i.timestamp }
-			
-			
-			times = match_times.zip(expected_times)
-			if times.all?{ |match, expected| match.between? expected, expected+input_leniancy }
-				yield event_timestamps.last
-			end
-		end
+		# 	if match.between? expected, expected+input_leniancy
+		# 		# keep going
+		# 		if i == inputs.size-1
+		# 			# on the final iteration...
+		# 			return most_recent_match.last
+		# 		end
+		# 	else
+		# 		# stop immediately
+		# 		return nil
+		# 	end
+		# end
 	end
 	
 	
