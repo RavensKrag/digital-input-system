@@ -53,56 +53,40 @@ module DIS
 			# 	but technically sequences have more inputs (count ups and downs)
 		end
 		
-		
-		[[:down, :press], [:up, :release]].each do |direction, input|
-			button_direction = "button_#{direction}"
+		def button_down(id)
+			@buffer.button_down id
 			
-			define_method button_direction do |id|
-				puts direction
+			@sequences.each do |s|
+				event_sequence = s.press_events
 				
-				@buffer.send button_direction, id
+				next unless event_sequence
 				
-				@sequences.each do |s|
-					event_sequence = s.send("#{input}_events")
-					
-					next unless event_sequence
-					
-					# @buffer.search event_sequence, @input_leniency do |timestamp|
-					# 	s.send(input) if recent?(timestamp)
-					# end
-					
-					
-					# @buffer.search event_sequence, @input_leniency, :reverse do |timestamp|
-					# 	if recent?(timestamp)
-					# 		s.send(input) 
-							
-					# 		# will only break if new enough input found
-					# 		# will not break if inputs are over threshold
-					# 		break
-					# 	else
-					# 		break
-					# 	end
-					# end
-					
-					# @buffer.search event_sequence, @input_leniency, :reverse do |timestamp|
-					# 	s.send(input) if recent?(timestamp)
-						
-					# 	# really only want the most recent one,
-					# 	# there's no way older ones would be more relevant
-					# 	# as the only relevant ones are the ones that happened recently
-					# 	break
-					# end
-					
-					
-					
-					
-					timestamp = @buffer.search event_sequence, @input_leniency
-					if timestamp
-						s.send(input) if recent?(timestamp)
-					end
-				end
+				# look for all of the events, in the order specified
+				timestamp = @buffer.search event_sequence, @input_leniency
+				
+				next unless timestamp
+				
+				s.press if recent?(timestamp)
 			end
+		end
+		
+		def button_up(id)
+			@buffer.button_up id
 			
+			@sequences.each do |s|
+				event_sequence = s.release_events
+				
+				next unless event_sequence
+				
+				# look for any one of the events, instead of all of them at once
+				timestamps =	event_sequence.collect do |event|
+									# Remember that #search can return nil
+									@buffer.search [event], @input_leniency
+								end
+				
+				# fire event if any of the timestamps happened recently
+				s.release if timestamps.compact.any?{ |time| recent?(time) }
+			end
 		end
 		
 		
@@ -139,6 +123,8 @@ module DIS
 			# puts "#{before} < #{time} < #{now}"
 			
 			# time.between? before, now
+			
+			
 			
 			puts "#{timestamp-time} ~~~ #{dt}"
 			(timestamp-time) < dt

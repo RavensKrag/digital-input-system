@@ -83,7 +83,7 @@ class Window < Gosu::Window
 			end
 			
 			on_release do
-				# puts "GOGOGOG!!!!"
+				puts "OUTTA HERE D:"
 			end
 			
 			on_idle do
@@ -99,6 +99,8 @@ class Window < Gosu::Window
 		# release event timestamps are irrelevant
 		# release event fire when any one of the release events are detected
 		chord.release_events = [
+			DIS::Event.new(Gosu::KbA, :up,	0),
+			DIS::Event.new(Gosu::KbS, :up,	0),
 			DIS::Event.new(Gosu::KbD, :up,	0)
 		]
 		
