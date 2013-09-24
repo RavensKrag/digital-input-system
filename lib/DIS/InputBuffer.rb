@@ -146,10 +146,13 @@ module DIS
 			
 			
 			
-			
+			# matches should be an array of arrays
+			# each sub array corresponds to one match
+			# each element of the subarray corresponds to one closure
 			regex_matches = @buffer.to_s.scan(query_regex) # scan from old to recent
 			
-			return nil if regex_matches.size == 0
+			
+			return nil if regex_matches.empty?
 			
 			most_recent_match = regex_matches.last
 			
