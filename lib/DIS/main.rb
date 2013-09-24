@@ -43,7 +43,37 @@ class Window < Gosu::Window
 		
 		@inpman = DIS::InputManager.new
 		
-		sequence = DIS::Sequence.new :test do
+		single = DIS::Sequence.new :single do
+			on_press do
+				puts "SINGLE BUTTON #{Gosu::milliseconds}"
+			end
+			
+			on_hold do
+				puts "SINGLE BUTTON #{Gosu::milliseconds}"
+			end
+			
+			on_release do
+				puts "it's dangerous to go alone"
+			end
+			
+			on_idle do
+				
+			end
+		end
+		single.press_events = [
+			DIS::Event.new(Gosu::KbD, :down, 0)
+		]
+
+		# release event timestamps are irrelevant
+		# release event fire when any one of the release events are detected
+		single.release_events = [
+			DIS::Event.new(Gosu::KbD, :up, 0)
+		]
+		
+		
+		
+		
+		sequence = DIS::Sequence.new :sequence do
 			on_press do
 				puts "BUTTON DOWN"
 			end
@@ -113,7 +143,8 @@ class Window < Gosu::Window
 		
 		
 		# @inpman.add sequence
-		@inpman.add chord	
+		@inpman.add chord
+		@inpman.add single
 	end
 	
 	def needs_cursor?
