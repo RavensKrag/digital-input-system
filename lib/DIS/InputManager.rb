@@ -56,7 +56,10 @@ module DIS
 		def button_down(id)
 			@buffer.button_down id
 			
-			@sequences.each do |s|
+			# Out of all tracked sequences, find any that could be relevant
+			# out of all relevant ones, execute the most complex sequence
+			
+			candidates = @sequences.collect do |s|
 				event_sequence = s.press_events
 				
 				next unless event_sequence
@@ -66,8 +69,12 @@ module DIS
 				
 				next unless timestamp
 				
-				s.press if recent?(timestamp)
+				# either collect this sequence, or nil
+				s if recent?(timestamp)
 			end
+			
+			most_complex_candidate = candidates.compact.sort.first
+			most_complex_candidate.press if most_complex_candidate
 		end
 		
 		def button_up(id)
