@@ -24,7 +24,7 @@ module DIS
 		def add(sequence)
 			# TODO: Properly insert into sorted structure
 			@sequences << sequence
-			@sequences.sort!
+			@sequences.sort! {|x,y| y <=> x}
 		end
 		
 		def reset
@@ -73,7 +73,9 @@ module DIS
 				s if recent?(timestamp)
 			end
 			
-			most_complex_candidate = candidates.compact.sort.first
+			candidates.compact!
+			
+			most_complex_candidate = candidates.max_by(&:complexity)
 			most_complex_candidate.press if most_complex_candidate
 		end
 		

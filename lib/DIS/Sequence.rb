@@ -37,9 +37,11 @@ module DIS
 		def <=>(other)
 			return super(other) unless other.is_a? self.class
 			
-			# reverse order
-			# TODO: sort collection reversed or something, instead of just flipping comparison def.
-			other.press_events.count <=> @press_events.count 
+			self.complexity <=> other.complexity
+		end
+		
+		def complexity
+			@press_events.count
 		end
 		
 		
