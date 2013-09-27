@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'DIS/Input'
+# require './DIS/Input'
 
 module DIS
 	class Event

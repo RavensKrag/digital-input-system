@@ -1,9 +1,13 @@
 #~ require 'DIS/DIS' # Load c extension files
 
-require 'DIS/InputManager'
-require 'DIS/InputBuffer'
-require 'DIS/Sequence'
-require 'DIS/Event'
+Dir.chdir File.dirname(__FILE__)
+
+require './DIS/Sequence'
+require './DIS/Event'
+require './DIS/Input'
+require './DIS/InputManager'
+require './DIS/InputBuffer'
+
 
 module DIS
 	def self.timestamp

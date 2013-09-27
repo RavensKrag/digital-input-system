@@ -7,7 +7,7 @@
 require 'rubygems'
 require 'state_machine'
 
-require 'DIS/Event'
+# require './DIS/Event'
 
 module DIS
 	class Sequence
@@ -58,49 +58,6 @@ module DIS
 		#                                        /_/                 
 		
 		# NOTE: Splitting between up and down like this doesn't work, because some sequences will have ups and down in them.  Use the Event objects instead, like with the buffered input.
-		
-		def button_down(id)
-			# put the button into the buffer
-			# check if the buffer is full up and good to go
-			
-			# press if all press events are fired
-			# (AND detection, order dependent)
-			
-			@press_i ||= 0
-			
-			if id == @press_events[@press_i]
-				# part of sequence detected
-				@press_i += 1
-			end
-			
-			if @press_i == @press_events.size
-				# sequence completed
-				
-			end
-		end
-		
-		def button_up(id)
-			# deal with button releases
-			# NOTE: algorithm will need to check on button down as well, if cancels are allowed
-			
-			# release if any of the release events has fired
-			# (OR detection)
-			
-			if @release_events.include? id
-				@press_i = 0
-			end
-		end
-		
-		
-		
-		
-		
-		def add(event)
-			# events signal either button up or button down inputs
-			
-			press if trigger_press? event
-			release if trigger_release? event
-		end
 		
 		def trigger_press?(event)
 			@press_i ||= 0
@@ -176,12 +133,9 @@ module DIS
 			
 			# release if any of the release events has fired
 			# (OR detection)
-			p @release_events
 			
 			if @release_events.include? event
 				reset_search
-				
-				puts "========RELEASE"
 				
 				return true
 			end
@@ -201,6 +155,7 @@ module DIS
 		# it may take allocation of data which is not necessary elsewhere,
 		# if possible, I would like to contain it here
 		# because the rest of the code flow is pretty clean
+		# TODO: Rename to something shorter (maybe #recent?)
 		def event_within_acceptable_time_threshold?(event, expected)
 			if @press_i == 0
 				# first event detected
@@ -249,7 +204,7 @@ module DIS
 		# /____/\__/\__,_/\__/\___/ 
 		# (Contains update)
 		
-		state_machine :status, :initial => :idle do
+		state_machine :button_state, :initial => :idle do
 			state :idle do
 				def update
 					idle_callback
@@ -295,7 +250,6 @@ module DIS
 		end
 		
 		def press_callback
-			puts "press"
 			instance_eval &@callbacks[:on_press]
 		end
 		

@@ -3,7 +3,8 @@
 # Find strings of button presses that match certain patterns,
 # and fire associated events
 
-require 'DIS/InputBuffer'
+# require './DIS/InputBuffer'
+# require './DIS/Sequence'
 
 module DIS
 	class InputManager
@@ -71,8 +72,6 @@ module DIS
 		end
 		
 		def button_down(id)
-			puts id
-			
 			# Out of all tracked sequences, find any that could be relevant
 			# out of all relevant ones, execute the most complex sequence
 			
@@ -98,30 +97,12 @@ module DIS
 				# clear buffer if any of the "release" events are triggered
 				# make sure you hit the #release event as well
 			# out of all the sequences that are ready, only execute the one with highest complexity
-			# complete_sequences =	@sequences.collect do |seq|
-			# 							seq.add id
-			# 							if seq.full?
-											
-			# 							end
-			# 						end
 			
-			# complete_sequences.compact!
-			# max = complete_sequences.max_by(&:complexity)
-			# max.press if max
+			
 			
 			# consider
 			# ex) chord(abc) ---> release(b) -> single(a)
 			# what's to keep the single from triggering after part of the chord is released, but the requirements for the single are still met?
-			
-			
-			
-			
-			
-			# @sequences.inject(NullMaximumSequence.new){ |max, seq| 
-			# 	seq.add id
-				
-			# 	(seq.full? and seq.complexity > max.complexity) ? seq : max
-			# }.press
 			
 			
 			
@@ -132,12 +113,15 @@ module DIS
 				) ? seq : max
 			}.press
 			
+			# Sequence#trigger_press? also controls iteration through different events in the sequence across multiple input update ticks
+			
+			# This assumes that the sequences are not sorted. You can take advantage of sorting the sequences collection by complexity to avoid the :complexity check
+			
 			# this iteration of the press/release trigger structure ignores that input sequences can contain downs as well as up 
+			
 		end
 		
 		def button_up(id)
-			puts id
-			
 			# @sequences.each do |seq|
 			# 	if seq.trigger_release? Event.new(id, :up, DIS.timestamp)
 			# 		seq.release
@@ -173,45 +157,13 @@ module DIS
 			
 			@sequences.each do |seq|
 				if seq.trigger_release? event
-					puts "-----RELEASE"
 					seq.release
 				else
-					puts "derp"
 					# will not trigger :press events on :up,
 					# but does not prevent them from being defined
 					seq.trigger_press? event
 				end
 			end
 		end
-		
-		private
-		
-		def recent?(time)
-			# dt determines the window
-			# dt varies with update rate
-			# at the very least, inputs are recent if they were entered
-			# within the last few frames or so
-			# but real wall clock time is also important
-			
-			# TODO: tweak dt
-			# dt = 550
-			# dt = 500
-			# dt = 300
-			# dt = 360
-			dt = 380
-			
-			# now = DIS.timestamp
-			# before = now - dt
-			
-			# puts "#{before} < #{time} < #{now}"
-			
-			# time.between? before, now
-			
-			
-			
-			puts "#{DIS.timestamp-time} ~~~ #{dt}"
-			(DIS.timestamp-time) < dt
-		end
-		
 	end
 end

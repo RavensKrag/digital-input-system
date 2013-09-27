@@ -1,2 +1,13 @@
 TODO: Sequences don't seem to be detected. Not sure if I'm specifying patterns wrong or if the parsing is wrong.  Need to build new tools to visualize that data.
 TODO: May want to investigate event disambiguation. Got an anomoly where both chord and single triggered. Might be leaning on the state machine as one-way valve too much.
+
+
+
+TODO: Getting doubles of release callbacks
+
+			ooooooh
+			when loading using 'DIS/Sequence'
+			ruby is loading from any and all available paths
+			THAT can INCLUDE GEMS
+			so when I'm trying to load code from this library,=
+			it's loading it from the globally installed 

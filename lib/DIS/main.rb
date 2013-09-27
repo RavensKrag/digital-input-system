@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 
-Dir.chdir File.dirname(__FILE__)
-
 require 'rubygems'
 require 'gosu'
 
@@ -13,13 +11,17 @@ require 'state_machine'
 
 require 'naught'
 
-require '../DIS'
-require './InputManager'
+
+Dir.chdir File.dirname(__FILE__)
+
+require '../DIS.rb'
+# require './Sequence'
+# require './Event'
+# require './Input'
+# require './InputManager'
 # require './InputBuffer'
 	# require './RingBuffer'
-require './Sequence'
-require './Event'
-require './Input'
+
 
 module DIS
 	def self.timestamp
@@ -51,7 +53,7 @@ class Window < Gosu::Window
 			end
 			
 			on_hold do
-				puts "SINGLE BUTTON #{Gosu::milliseconds}"
+				puts "ONE HOLD #{Gosu::milliseconds}"
 			end
 			
 			on_release do
@@ -63,13 +65,13 @@ class Window < Gosu::Window
 			end
 		end
 		single.press_events = [
-			DIS::Event.new(Gosu::KbD, :down, 0)
+			DIS::Event.new(Gosu::KbD, :down)
 		]
 
 		# release event timestamps are irrelevant
 		# release event fire when any one of the release events are detected
 		single.release_events = [
-			DIS::Event.new(Gosu::KbD, :up, 0)
+			DIS::Event.new(Gosu::KbD, :up)
 		]
 		
 		
@@ -105,7 +107,7 @@ class Window < Gosu::Window
 		# release event timestamps are irrelevant
 		# release event fire when any one of the release events are detected
 		sequence.release_events = [
-			DIS::Event.new(Gosu::KbD, :up,	0)
+			DIS::Event.new(Gosu::KbD, :up)
 		]
 		
 		
@@ -130,17 +132,17 @@ class Window < Gosu::Window
 			end
 		end
 		chord.press_events = [
-			DIS::Event.new(Gosu::KbA, :down,	0),
-			DIS::Event.new(Gosu::KbS, :down,	0),
-			DIS::Event.new(Gosu::KbD, :down,	0)
+			DIS::Event.new(Gosu::KbA, :down),
+			DIS::Event.new(Gosu::KbS, :down),
+			DIS::Event.new(Gosu::KbD, :down)
 		]
 
 		# release event timestamps are irrelevant
 		# release event fire when any one of the release events are detected
 		chord.release_events = [
-			DIS::Event.new(Gosu::KbA, :up,	0),
-			DIS::Event.new(Gosu::KbS, :up,	0),
-			DIS::Event.new(Gosu::KbD, :up,	0)
+			DIS::Event.new(Gosu::KbA, :up),
+			DIS::Event.new(Gosu::KbS, :up),
+			DIS::Event.new(Gosu::KbD, :up)
 		]
 		
 		
@@ -163,13 +165,13 @@ class Window < Gosu::Window
 			end
 		end
 		mouse_and_keyboard.press_events = [
-			DIS::Event.new(Gosu::MsLeft, :down, 0),
-			DIS::Event.new(Gosu::KbLeftShift, :down, 0)
+			DIS::Event.new(Gosu::MsLeft, :down),
+			DIS::Event.new(Gosu::KbLeftShift, :down)
 		]
 		
 		mouse_and_keyboard.release_events = [
-			DIS::Event.new(Gosu::MsLeft, :up, 0),
-			# DIS::Event.new(Gosu::KbLeftShift, :up, 0)
+			DIS::Event.new(Gosu::MsLeft, :up),
+			# DIS::Event.new(Gosu::KbLeftShift, :up)
 		]
 		
 		
