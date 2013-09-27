@@ -10,9 +10,9 @@ require 'require_all'
 require 'state_machine'
 
 
-Dir.chdir File.dirname(__FILE__)
+# Dir.chdir File.dirname(__FILE__)
 
-require '../DIS.rb'
+require_relative '../DIS.rb'
 # require './Sequence'
 # require './Event'
 # require './Input'

@@ -4,7 +4,7 @@
 # what do do when those strings are found,
 # and the current state of high-level input.
 
-require 'rubygems'
+# require 'rubygems'
 require 'state_machine'
 
 # require './DIS/Event'

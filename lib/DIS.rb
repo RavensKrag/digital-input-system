@@ -1,12 +1,12 @@
 #~ require 'DIS/DIS' # Load c extension files
 
-Dir.chdir File.dirname(__FILE__)
+# Dir.chdir File.dirname(__FILE__)
 
-require './DIS/Sequence'
-require './DIS/Event'
-require './DIS/Input'
-require './DIS/InputManager'
-require './DIS/InputBuffer'
+require_relative './DIS/Sequence'
+require_relative './DIS/Event'
+require_relative './DIS/Input'
+require_relative './DIS/InputManager'
+require_relative './DIS/InputBuffer'
 
 
 module DIS
