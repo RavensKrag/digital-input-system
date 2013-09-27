@@ -136,3 +136,14 @@ but when you want to fight an up event
 maybe the sequence requested to be searched by the event tracker should change
 from the button down sequence to the button up sequence
 depending on the state of the event tracker?
+
+
+question:
+	want to detct
+		chord(ABC) -> chord(BCD)
+	actual input is
+		chord(ABC) -> B -> chord(BCD)
+	but the chords hit at expected times
+	is the input valid, or not, and why?
+answer:
+	???

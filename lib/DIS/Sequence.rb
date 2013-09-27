@@ -17,6 +17,10 @@ module DIS
 		
 		NULL_CALLBACK = Proc.new {|o| }
 		
+		# 80ms is considered by some to be the threshold of perception.
+		# Specifying this amount of leniency means no leniency at all.
+		@@input_leniency = 80
+		
 		attr_reader :name
 		
 		def initialize(name, &block)
@@ -44,6 +48,173 @@ module DIS
 		
 		def complexity
 			@press_events.count
+		end
+		
+		#     ____                          ____                  __ 
+		#    / __ \____ ______________     /  _/___  ____  __  __/ /_
+		#   / /_/ / __ `/ ___/ ___/ _ \    / // __ \/ __ \/ / / / __/
+		#  / ____/ /_/ / /  (__  )  __/  _/ // / / / /_/ / /_/ / /_  
+		# /_/    \__,_/_/  /____/\___/  /___/_/ /_/ .___/\__,_/\__/  
+		#                                        /_/                 
+		
+		# NOTE: Splitting between up and down like this doesn't work, because some sequences will have ups and down in them.  Use the Event objects instead, like with the buffered input.
+		
+		def button_down(id)
+			# put the button into the buffer
+			# check if the buffer is full up and good to go
+			
+			# press if all press events are fired
+			# (AND detection, order dependent)
+			
+			@press_i ||= 0
+			
+			if id == @press_events[@press_i]
+				# part of sequence detected
+				@press_i += 1
+			end
+			
+			if @press_i == @press_events.size
+				# sequence completed
+				
+			end
+		end
+		
+		def button_up(id)
+			# deal with button releases
+			# NOTE: algorithm will need to check on button down as well, if cancels are allowed
+			
+			# release if any of the release events has fired
+			# (OR detection)
+			
+			if @release_events.include? id
+				@press_i = 0
+			end
+		end
+		
+		
+		
+		
+		
+		def add(event)
+			# events signal either button up or button down inputs
+			
+			press if trigger_press? event
+			release if trigger_release? event
+		end
+		
+		def trigger_press?(event)
+			@press_i ||= 0
+			
+			
+			# events match up if
+			# all of the following (AND detection)
+			# * the input signal for the actual event matches the expected exactly
+			# * the time of the actual event is close enough to the expected time
+			
+			
+			
+			# event.timestamp.between? expected_event.timestamp, expected_event.timestamp+dt
+			# => timestamp < event.timestamp < timestamp + dt
+			
+			# timestamp - event.timestamp < dt
+			# * bounded on the bottom, but not the top
+			# * bounded by start time, but not by end
+			
+			
+			
+			
+			
+			
+			# put the button into the buffer
+			# check if the buffer is full up and good to go
+			
+			# press if all press events are fired
+			# (AND detection, order dependent)
+			
+			# See if the incoming event matches against this particular input sequence
+			# if event == @press_events[@press_i] # probably can't match with equality test
+			expected = @press_events[@press_i]
+			if expected.input == event.input
+				# desired input
+				
+				
+				# expected timestamps are given relative to the time of the first event
+				# runtime timestamps need to be adjusted accordingly
+				if event_within_acceptable_time_threshold?(event, expected)
+					# acceptable time
+					
+					# proceed
+					
+					# part of sequence detected
+					@press_i += 1
+				else
+					# not within the time window
+					
+					reset_search
+				end
+			else
+				# not the desired input
+			end
+			
+			if @press_i == @press_events.size
+				# sequence completed
+				
+				# fire event
+				# start looking from the beginning again
+				reset_search
+				
+				return true
+			end
+			
+			
+			return false
+		end
+		
+		def trigger_release?(event)
+			# deal with button releases
+			# NOTE: algorithm will need to check on button down as well, if cancels are allowed
+			
+			# release if any of the release events has fired
+			# (OR detection)
+			p @release_events
+			
+			if @release_events.include? event
+				reset_search
+				
+				puts "========RELEASE"
+				
+				return true
+			end
+			
+			
+			return false
+		end
+		
+		def reset_search
+			@press_i ||= 0
+			
+			@press_i = 0
+		end
+		
+		
+		# this is the trickiest part of the algorithm
+		# it may take allocation of data which is not necessary elsewhere,
+		# if possible, I would like to contain it here
+		# because the rest of the code flow is pretty clean
+		def event_within_acceptable_time_threshold?(event, expected)
+			if @press_i == 0
+				# first event detected
+				# check if the first event is timely
+				
+				# first event doesn't matter
+				# use this to establish the time basis
+				@time_basis = event.timestamp
+			end
+			
+			
+			time = event.timestamp - @time_basis
+			
+			time.between? expected.timestamp, expected.timestamp+@@input_leniency
 		end
 		
 		

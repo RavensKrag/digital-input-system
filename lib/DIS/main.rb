@@ -11,10 +11,12 @@ require 'require_all'
 
 require 'state_machine'
 
+require 'naught'
+
 require '../DIS'
 require './InputManager'
-require './InputBuffer'
-	require './RingBuffer'
+# require './InputBuffer'
+	# require './RingBuffer'
 require './Sequence'
 require './Event'
 require './Input'
