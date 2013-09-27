@@ -9,8 +9,6 @@ require 'require_all'
 
 require 'state_machine'
 
-require 'naught'
-
 
 Dir.chdir File.dirname(__FILE__)
 

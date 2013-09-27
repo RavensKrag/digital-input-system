@@ -8,11 +8,6 @@
 
 module DIS
 	class InputManager
-		NullMaximumSequence = Naught.build{ |n| n.mimic DIS::Sequence }
-		def NullMaximumSequence.complexity
-			-1 # lower than the normal possibly complexity
-		end
-		
 		NULL_MAXIMUM_SEQUENCE = Struct.new(:complexity) do
 			def trigger_press?
 				
