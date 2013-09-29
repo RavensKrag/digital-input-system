@@ -12,7 +12,7 @@ require 'state_machine'
 
 # Dir.chdir File.dirname(__FILE__)
 
-require_relative '../DIS.rb'
+require_relative '../lib/DIS.rb'
 # require './Sequence'
 # require './Event'
 # require './Input'
