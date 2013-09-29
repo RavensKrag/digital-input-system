@@ -10,15 +10,7 @@ require 'require_all'
 require 'state_machine'
 
 
-# Dir.chdir File.dirname(__FILE__)
-
 require_relative '../lib/DIS.rb'
-# require './Sequence'
-# require './Event'
-# require './Input'
-# require './InputManager'
-# require './InputBuffer'
-	# require './RingBuffer'
 
 
 module DIS

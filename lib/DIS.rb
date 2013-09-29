@@ -1,7 +1,5 @@
 #~ require 'DIS/DIS' # Load c extension files
 
-# Dir.chdir File.dirname(__FILE__)
-
 require_relative './DIS/Sequence'
 require_relative './DIS/Event'
 require_relative './DIS/Input'
