@@ -226,13 +226,23 @@ it WILL have taken effect on the next input tick
 thus, you have the perceived off-by-one error
 
 
-
 this is a problem with refusing to transition,
 in order to prevent callbacks
 	perhaps solution is to fully separate transitions from whether or not callbacks fire?
+
+no, rather
+
+need to transition to edge on press for complex events to trigger
+need to cancel events back so they don't execute in the #update
+
+
 
 
 solution:
 	Use Strategy A for handeling edge triggers as seen above
 	this is accomplished by spliting state machine from 2 states into 4 states
 	also, running callbacks only on #update, rather than immediately after Event is processed
+	
+	This requires implementing input canceling,
+	but the valence shell algorithm uses canceling as part of it's mark/unmark system, so it's fine
+	canceling is just bad if it's some weird cludgy thing

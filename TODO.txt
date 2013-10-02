@@ -2,6 +2,8 @@ TODO: Sequences don't seem to be detected. Not sure if I'm specifying patterns w
 TODO: May want to investigate event disambiguation. Got an anomoly where both chord and single triggered. Might be leaning on the state machine as one-way valve too much.
 
 
+TODO: Explore using nested classes to separate functionally distinct sections within a class.  Need to see if nested classes can be updated on children in a sane manner.
+
 
 TODO: Getting doubles of release callbacks
 
