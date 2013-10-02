@@ -21,19 +21,13 @@ module DIS
 			# press if all sub-sequences have been pressed
 			# (AND detection, non-sequential)
 			
-			# puts "#{@name} down"
-			
-			# pressed_string = @sub_sequences.inject("") do |out, i|
-			# 	out << "#{i.name} #{i.active?}, "
-			# end
-			
-			# puts pressed_string
-			
 			
 			# if @sub_sequences.all?{ |i| i.active? }
 			if @sub_sequences.all?{ |i| i.positive? }
-				puts "YAY"
-				
+				# this cancel means that the next time buttons are checked, 
+				# the Accelerator will not be active
+				# but without the cancel, the sub sequences (excluding the last)
+				# will continue to fire callbacks (notably the :active state (but also :idle))
 				@sub_sequences.each{ |i| i.cancel }
 				
 				return true
@@ -46,9 +40,10 @@ module DIS
 		def trigger_release?(event)
 			# release if any sub-sequences has been released
 			# (OR detection)
-			
 			if @sub_sequences.any?{ |i| i.negative? }
 				reset_search
+				
+				@release_event = event # store for release callback
 				
 				return true
 			end
@@ -59,6 +54,17 @@ module DIS
 		
 		def reset_search
 			
+		end
+		
+		private
+		
+		def release_callback
+			# restore all sub sequences that were canceled as a result of the accelerator
+			@sub_sequences.reject{ |i| i.release_events.include? @release_event }.each do |seq|
+				seq.press
+			end
+			
+			super()
 		end
 	end
 end

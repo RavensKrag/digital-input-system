@@ -246,3 +246,31 @@ solution:
 	This requires implementing input canceling,
 	but the valence shell algorithm uses canceling as part of it's mark/unmark system, so it's fine
 	canceling is just bad if it's some weird cludgy thing
+
+
+
+
+current accelerator issues
+	chord can trigger while mouse_and_keyboard is running, but single can't
+	^ don't remember this being a thing...
+
+
+
+Issue: 
+	*	Accelerator has false negative (fires the release at weird time)
+		if any other key is released, (even ones not in the accelerator pattern)
+		then the accelerator will release
+		
+	*	accelerator not active when pattern breaks
+		shift (hold) -> click -> click -> click -> shift (release)
+		each click should fire the shift_click event, but only the first one does
+Solution:
+	accelerator changed to restore the sub-inputs it canceled during start up
+	
+	alternative is to somehow guard against occluded events firing.
+	thought about testing in #update,
+	but that would require occlusion testing every frame, rather than only on state change
+		(probably would only care about :active and :idle)
+		(you want to allow for state transitions, so the edge states must update)
+	
+	#push used rather than just setting state, as jumping states could result in strange behavior

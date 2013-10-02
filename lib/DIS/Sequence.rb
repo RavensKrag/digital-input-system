@@ -238,16 +238,16 @@ module DIS
 				transition :idle => :going_down
 			end
 			
+			event :to_active do
+				transition :going_down => :active
+			end
+			
 			event :release do
 				transition :active => :going_up
 			end
 			
 			event :to_idle do
 				transition :going_up => :idle
-			end
-			
-			event :to_active do
-				transition :going_down => :active
 			end
 			
 			event :cancel_event do
