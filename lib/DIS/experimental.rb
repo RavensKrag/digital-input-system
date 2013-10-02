@@ -199,3 +199,86 @@ complex = ComplexSequence.new(
 
 
 inpman.add sequence
+
+
+
+
+
+
+accelerator(a, b, c, d)
+accelerator(a) + main # works best if accelerator is the first argument
+	accelerator(shift) + click
+	
+	# can you use the order to attach meaning?
+	run + jump
+	jump + run
+	# clearly, yeah
+	
+	
+	run + jump + kick*2 + jump + dive_kick
+
+
+
+
+
+
+
+
+# ===== Link one button to many actions
+# -- definition
+single = DIS::Sequence.new
+single.press_events = [
+	DIS::Event.new(Gosu::KbD, :down)
+]
+single.release_events = [
+	DIS::Event.new(Gosu::KbD, :up)
+]
+
+# -- linkage
+if single.press?		# only will work if :press runs for one tick before other phases trigger
+	
+end
+
+
+
+single.on_press do		# need a way to add and remove callbacks from this structure easily
+	this
+	that
+	the_other
+end
+
+single.press_callbacks.add :this do
+	# this
+end
+single.press_callbacks.add :that do
+	# that
+end
+single.press_callbacks.add :the_other do
+	# the_other
+end
+# may want to raise an error if there is already a callback
+# with the desired name
+
+
+
+
+single.press_callbacks.delete :this # return removed block
+single.press_callbacks.delete :that
+single.press_callbacks.delete :the_other
+
+
+
+
+# Now this is a hash
+# ... it's also kinda ugly :P
+single.press_callbacks[:this] = Proc.new do
+	# this
+end
+single.press_callbacks[:that] = Proc.new do
+	# that
+end
+single.press_callbacks[:the_other] = Proc.new do
+	# the_other
+end
+# Ideally, @press_callbacks would be a Set
+# or at least have the same interface
