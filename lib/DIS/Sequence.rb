@@ -13,7 +13,7 @@ module DIS
 	class Sequence
 		include Comparable
 		
-		CALLBACK_NAMES = [:on_press, :on_hold, :on_release, :on_idle]
+		CALLBACK_NAMES = [:on_press, :on_hold, :on_release, :on_idle, :on_cancel]
 		
 		NULL_CALLBACK = Proc.new {|o| }
 		
@@ -250,15 +250,21 @@ module DIS
 				transition :going_down => :active
 			end
 			
-			event :cancel do
+			event :cancel_event do
 				transition any => :idle
 			end
-			# call :reset_search when you cancel
-			after_transition any => :idle, :do => :reset_search
 			# make sure that reset not called on transition from :idle to :idle
 			# (it shouldn't have any effect, but it's kinda wasteful / annoying)
 		end
 		# private :to_idle, :to_active
+		private :cancel_event
+		
+		# define cancels this way to allow execution of callback on event, rather than transition
+		def cancel
+			cancel_event
+			reset_search
+			cancel_callback
+		end
 		
 		def positive?
 			return going_down? || active?
@@ -292,6 +298,10 @@ module DIS
 		
 		def release_callback
 			instance_eval &@callbacks[:on_release]
+		end
+		
+		def cancel_callback
+			instance_eval &@callbacks[:on_cancel]
 		end
 	end
 end
