@@ -137,9 +137,11 @@ class Window < Gosu::Window
 		
 		
 		
-		mouse_and_keyboard = DIS::Sequence.new :mouse_and_keyboard do
+		
+		
+		mouse_click = DIS::Sequence.new :click do
 			on_press do
-				puts "----CLICK #{Gosu::milliseconds}"
+				puts "----CLICK (START) #{Gosu::milliseconds}"
 			end
 			
 			on_hold do
@@ -154,20 +156,68 @@ class Window < Gosu::Window
 				# puts "GOGOGOG!!!!"
 			end
 		end
-		mouse_and_keyboard.press_events = [
+		mouse_click.press_events = [
 			DIS::Event.new(Gosu::MsLeft, :down),
-			DIS::Event.new(Gosu::KbLeftShift, :down)
+		]
+		mouse_click.release_events = [
+			DIS::Event.new(Gosu::MsLeft, :up),
 		]
 		
-		mouse_and_keyboard.release_events = [
-			DIS::Event.new(Gosu::MsLeft, :up),
-			# DIS::Event.new(Gosu::KbLeftShift, :up)
+		
+		
+		shift = DIS::Sequence.new :shift do
+			on_press do
+				puts "~~~shift start~~~ #{Gosu::milliseconds}"
+			end
+			
+			on_hold do
+				puts "~~~shift~~~ #{Gosu::milliseconds}"
+			end
+			
+			on_release do
+				puts "outie~~"
+			end
+			
+			on_idle do
+				# puts "GOGOGOG!!!!"
+			end
+		end
+		shift.press_events = [
+			DIS::Event.new(Gosu::KbLeftShift, :down),
 		]
+		shift.release_events = [
+			DIS::Event.new(Gosu::KbLeftShift, :up),
+		]
+		
+		
+		mouse_and_keyboard = DIS::Accelerator.new :shift_click, shift, mouse_click do
+			on_press do
+				puts "+-+-+ Start #{Gosu::milliseconds}"
+			end
+			
+			on_hold do
+				puts "+-+-+ Together #{Gosu::milliseconds}"
+			end
+			
+			on_release do
+				puts "X-X-X-X-X-X end"
+			end
+			
+			on_idle do
+				# puts "GOGOGOG!!!!"
+			end
+		end
+		
+		
 		
 		
 		# @inpman.add sequence
 		@inpman.add chord
 		@inpman.add single
+		
+		@inpman.add mouse_click
+		@inpman.add shift
+		
 		@inpman.add mouse_and_keyboard
 	end
 	

@@ -3,6 +3,9 @@
 require_relative './DIS/Sequence'
 require_relative './DIS/Event'
 require_relative './DIS/Input'
+
+require_relative './DIS/Sequences/Accelerator'
+
 require_relative './DIS/InputManager'
 require_relative './DIS/InputBuffer'
 

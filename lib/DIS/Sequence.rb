@@ -41,7 +41,7 @@ module DIS
 		end
 		
 		def <=>(other)
-			return super(other) unless other.is_a? self.class
+			# return super(other) unless other.is_a? self.class # FIXME: this seems cause problems
 			
 			self.complexity <=> other.complexity
 		end
@@ -145,8 +145,6 @@ module DIS
 		end
 		
 		def reset_search
-			@press_i ||= 0
-			
 			@press_i = 0
 		end
 		
@@ -211,24 +209,63 @@ module DIS
 				end
 			end
 			
+			state :going_down do
+				def update
+					press_callback
+					
+					# transition to :active
+					to_active
+				end
+			end
+			
 			state :active do
 				def update
 					hold_callback
 				end
 			end
 			
+			state :going_up do
+				def update
+					release_callback
+					
+					# transition to :idle
+					to_idle
+				end
+			end
+			
 			
 			event :press do
-				transition :idle => :active
+				transition :idle => :going_down
 			end
 			
 			event :release do
-				transition :active => :idle
+				transition :active => :going_up
 			end
 			
+			event :to_idle do
+				transition :going_up => :idle
+			end
 			
-			after_transition :idle => :active, :do => :press_callback
-			after_transition :active => :idle, :do => :release_callback
+			event :to_active do
+				transition :going_down => :active
+			end
+			
+			event :cancel do
+				transition any => :idle
+			end
+			# call :reset_search when you cancel
+			after_transition any => :idle, :do => :reset_search
+			# make sure that reset not called on transition from :idle to :idle
+			# (it shouldn't have any effect, but it's kinda wasteful / annoying)
+		end
+		# private :to_idle, :to_active
+		
+		def positive?
+			return going_down? || active?
+		end
+		
+		def negative?
+			return going_up? || idle?
 		end
 		
 		private
@@ -244,13 +281,13 @@ module DIS
 			instance_eval &@callbacks[:on_idle]
 		end
 		
+		def press_callback
+			instance_eval &@callbacks[:on_press]
+		end
+		
 		def hold_callback
 			# TODO: give hold duration to the block
 			instance_eval &@callbacks[:on_hold]
-		end
-		
-		def press_callback
-			instance_eval &@callbacks[:on_press]
 		end
 		
 		def release_callback

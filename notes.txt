@@ -147,3 +147,92 @@ question:
 	is the input valid, or not, and why?
 answer:
 	???
+
+
+
+
+accelerator(shift) + click
+	accelerators are OR detection, rather than the AND detection usually used on :press test
+	well, not OR, because that would fire on any
+	rather, non-sequential AND
+	
+	--- does it matter at all what the order is?
+	when you talk about accelerators, it feels like (example) shift is auxilerry, and click is main
+	but the whole accelerator pattern only fires when the whole thing is compelete
+	so does it matter what order you look for these things?
+	
+	AND relations can short-circuit if only one of the things is false
+	is there a particular order to accelerator patterns that will help with short-circuiting?
+	
+	
+	POSSIBLE IMPLEMENTATION
+	
+	put all evens in a hash
+	when you match any event in the hash
+	take the value, and set it to true
+	run Hash#all? to see if :press event fires
+	
+	-> gets complicated when you have Sequences as triggers, rather than simple events
+
+
+
+
+complex(a, b, c) + simple
+analogous to
+[a, b, c] + d
+might just be easier to do
+[a, b, c] + [d]
+and be done with it
+not sure though if the user of the library should be forced to do that conversion manually
+
+though... for numbers, auto-conversion is standard
+
+
+if you wrap like this, it becomes just a matter of checking if all sequences are active
+
+
+
+
+
+
+---------------------------------------------
+---- how should edge trigger be handled? ----
+---------------------------------------------
+Strategy A
+	tick		press			hold only triggers if the button is held for more than one tick
+	tick		hold			
+	tick		hold			
+	
+	
+	or
+
+Strategy B	
+	tick		press			hold triggers after the edge transition
+				hold			
+	tick		hold			
+	tick		hold			
+
+
+
+
+
+complex events can't fire press until next tick
+because #trigger_press? doesn't actually fire transition
+it basically just queues the transition
+
+so the transition has not taken effect when the complex is evaluated
+it WILL have taken effect on the next input tick
+
+thus, you have the perceived off-by-one error
+
+
+
+this is a problem with refusing to transition,
+in order to prevent callbacks
+	perhaps solution is to fully separate transitions from whether or not callbacks fire?
+
+
+solution:
+	Use Strategy A for handeling edge triggers as seen above
+	this is accomplished by spliting state machine from 2 states into 4 states
+	also, running callbacks only on #update, rather than immediately after Event is processed
