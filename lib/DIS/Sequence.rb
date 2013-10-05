@@ -284,24 +284,24 @@ module DIS
 		
 		
 		def idle_callback
-			instance_eval &@callbacks[:on_idle]
+			&@callbacks[:on_idle].call
 		end
 		
 		def press_callback
-			instance_eval &@callbacks[:on_press]
+			&@callbacks[:on_press].call
 		end
 		
 		def hold_callback
 			# TODO: give hold duration to the block
-			instance_eval &@callbacks[:on_hold]
+			&@callbacks[:on_hold].call
 		end
 		
 		def release_callback
-			instance_eval &@callbacks[:on_release]
+			&@callbacks[:on_release].call
 		end
 		
 		def cancel_callback
-			instance_eval &@callbacks[:on_cancel]
+			&@callbacks[:on_cancel].call
 		end
 	end
 end
