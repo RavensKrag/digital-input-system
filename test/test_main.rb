@@ -38,21 +38,23 @@ class Window < Gosu::Window
 		@inpman = DIS::InputManager.new
 		
 		single = DIS::Sequence.new :single
-			single.callbacks[:default].on_press do
+		single.callbacks[:default].tap do |c|
+			c.on_press do
 				puts "SINGLE BUTTON #{Gosu::milliseconds}"
 			end
 			
-			single.callbacks[:default].on_hold do
+			c.on_hold do
 				puts "ONE HOLD #{Gosu::milliseconds}"
 			end
 			
-			single.callbacks[:default].on_release do
+			c.on_release do
 				puts "it's dangerous to go alone"
 			end
 			
-			single.callbacks[:default].on_idle do
+			c.on_idle do
 				
 			end
+		end
 		single.press_events = [
 			DIS::Event.new(Gosu::KbD, :down)
 		]
@@ -67,21 +69,23 @@ class Window < Gosu::Window
 		
 		
 		sequence = DIS::Sequence.new :sequence
-			sequence.callbacks[:default].on_press do
+		sequence.callbacks[:default].tap do |c|
+			c.on_press do
 				puts "BUTTON DOWN"
 			end
 			
-			sequence.callbacks[:default].on_hold do
+			c.on_hold do
 				
 			end
 			
-			sequence.callbacks[:default].on_release do
+			c.on_release do
 				
 			end
 			
-			sequence.callbacks[:default].on_idle do
+			c.on_idle do
 				
 			end
+		end
 		sequence.press_events = [
 			DIS::Event.new(Gosu::KbA, :down,	0+300*0),
 			DIS::Event.new(Gosu::KbA, :up,	200+300*0),
@@ -103,21 +107,23 @@ class Window < Gosu::Window
 		# ex) roll(c,b,a) -> chord(a,b,c) -> chord(a,b,c)
 		# 		first chord not detected, but second chord is
 		chord = DIS::Sequence.new :chord
-			chord.callbacks[:default].on_press do
+		chord.callbacks[:default].tap do |c|
+			c.on_press do
 				puts "GOGOGOG!!!! #{Gosu::milliseconds}"
 			end
 			
-			chord.callbacks[:default].on_hold do
+			c.on_hold do
 				puts "GOGOGOG!!!! #{Gosu::milliseconds}"
 			end
 			
-			chord.callbacks[:default].on_release do
+			c.on_release do
 				puts "OUTTA HERE D:"
 			end
 			
-			chord.callbacks[:default].on_idle do
+			c.on_idle do
 				# puts "GOGOGOG!!!!"
 			end
+		end
 		chord.press_events = [
 			DIS::Event.new(Gosu::KbA, :down),
 			DIS::Event.new(Gosu::KbS, :down),
@@ -137,21 +143,23 @@ class Window < Gosu::Window
 		
 		
 		mouse_click = DIS::Sequence.new :click
-			mouse_click.callbacks[:default].on_press do
+		mouse_click.callbacks[:default].tap do |c|
+			c.on_press do
 				puts "----CLICK (START) #{Gosu::milliseconds}"
 			end
 			
-			mouse_click.callbacks[:default].on_hold do
+			c.on_hold do
 				puts "----CLICK #{Gosu::milliseconds}"
 			end
 			
-			mouse_click.callbacks[:default].on_release do
+			c.on_release do
 				puts "nope nope nope"
 			end
 			
-			mouse_click.callbacks[:default].on_idle do
+			c.on_idle do
 				# puts "GOGOGOG!!!!"
 			end
+		end
 		mouse_click.press_events = [
 			DIS::Event.new(Gosu::MsLeft, :down),
 		]
@@ -162,21 +170,23 @@ class Window < Gosu::Window
 		
 		
 		shift = DIS::Sequence.new :shift
-			shift.callbacks[:default].on_press do
+		shift.callbacks[:default].tap do |c|
+			c.on_press do
 				puts "~~~shift start~~~ #{Gosu::milliseconds}"
 			end
 			
-			shift.callbacks[:default].on_hold do
+			c.on_hold do
 				puts "~~~shift~~~ #{Gosu::milliseconds}"
 			end
 			
-			shift.callbacks[:default].on_release do
+			c.on_release do
 				puts "outie~~"
 			end
 			
-			shift.callbacks[:default].on_idle do
+			c.on_idle do
 				# puts "GOGOGOG!!!!"
 			end
+		end
 		shift.press_events = [
 			DIS::Event.new(Gosu::KbLeftShift, :down),
 		]
@@ -186,21 +196,23 @@ class Window < Gosu::Window
 		
 		
 		mouse_and_keyboard = DIS::Accelerator.new :shift_click, shift, mouse_click
-			mouse_and_keyboard.callbacks[:default].on_press do
+		mouse_and_keyboard.callbacks[:default].tap do |c|
+			c.on_press do
 				puts "+-+-+ Start #{Gosu::milliseconds}"
 			end
 			
-			mouse_and_keyboard.callbacks[:default].on_hold do
+			c.on_hold do
 				puts "+-+-+ Together #{Gosu::milliseconds}"
 			end
 			
-			mouse_and_keyboard.callbacks[:default].on_release do
+			c.on_release do
 				puts "X-X-X-X-X-X end"
 			end
 			
-			mouse_and_keyboard.callbacks[:default].on_idle do
+			c.on_idle do
 				# puts "GOGOGOG!!!!"
 			end
+		end
 		
 		
 		
@@ -214,7 +226,7 @@ class Window < Gosu::Window
 		
 		@inpman.add mouse_and_keyboard
 	end
-	
+		
 	def needs_cursor?
 		true
 	end
