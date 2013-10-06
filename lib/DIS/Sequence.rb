@@ -326,14 +326,8 @@ module DIS
 			
 			# Hold one set of callbacks
 			class CallbackSet
-				NULL_CALLBACK = Proc.new {|o| }
-				
 				def initialize(&block)
 					@callbacks = Hash.new
-					
-					# CALLBACK_NAMES.each do |name|
-					# 	@callbacks[name] = NULL_CALLBACK
-					# end
 					
 					instance_eval &block if block
 				end
