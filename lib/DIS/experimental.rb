@@ -267,18 +267,27 @@ single.press_callbacks.delete :that
 single.press_callbacks.delete :the_other
 
 
+single.press_callbacks.clear # delete all callbacks
 
 
-# Now this is a hash
-# ... it's also kinda ugly :P
-single.press_callbacks[:this] = Proc.new do
-	# this
+single.callbacks.add :this do
+	on_press do
+		puts "~~~shift start~~~ #{Gosu::milliseconds}"
+	end
+
+	on_hold do
+		puts "~~~shift~~~ #{Gosu::milliseconds}"
+	end
+
+	on_release do
+		puts "outie~~"
+	end
+
+	on_idle do
+		# puts "GOGOGOG!!!!"
+	end
 end
-single.press_callbacks[:that] = Proc.new do
-	# that
-end
-single.press_callbacks[:the_other] = Proc.new do
-	# the_other
-end
-# Ideally, @press_callbacks would be a Set
-# or at least have the same interface
+
+
+
+# could be able to add with the same name, and register new callbacks

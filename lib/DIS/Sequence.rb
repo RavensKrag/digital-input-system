@@ -13,10 +13,6 @@ module DIS
 	class Sequence
 		include Comparable
 		
-		CALLBACK_NAMES = [:on_press, :on_hold, :on_release, :on_idle, :on_cancel]
-		
-		NULL_CALLBACK = Proc.new {|o| }
-		
 		# 80ms is considered by some to be the threshold of perception.
 		# Specifying this amount of leniency means no leniency at all.
 		@@input_leniency = 80
@@ -32,12 +28,13 @@ module DIS
 			@press_events = Array.new
 			@release_events = Array.new
 			
-			@callbacks = Hash.new
-			CALLBACK_NAMES.each do |name|
-				@callbacks[name] = NULL_CALLBACK
-			end
 			
-			instance_eval &block if block
+			# callbacks to be fired on events
+			@callbacks = CallbackManager.new
+			
+			if block
+				@callbacks.add :default, &block
+			end
 		end
 		
 		def <=>(other)
@@ -180,21 +177,6 @@ module DIS
 		attr_accessor :press_events, :release_events
 		
 		
-		#    ______      ______               __       
-		#   / ____/___ _/ / / /_  ____ ______/ /_______
-		#  / /   / __ `/ / / __ \/ __ `/ ___/ //_/ ___/
-		# / /___/ /_/ / / / /_/ / /_/ / /__/ ,< (__  ) 
-		# \____/\__,_/_/_/_.___/\__,_/\___/_/|_/____/  
-		# Definition only.  Execution is only ever handled internally
-		
-		CALLBACK_NAMES.each do |callback_name|
-			define_method callback_name do |&block|
-				@callbacks[callback_name] = block
-			end
-			private callback_name
-		end
-		
-		
 		#    _____ __        __     
 		#   / ___// /_____ _/ /____ 
 		#   \__ \/ __/ __ `/ __/ _ \
@@ -205,13 +187,13 @@ module DIS
 		state_machine :button_state, :initial => :idle do
 			state :idle do
 				def update
-					idle_callback
+					@callbacks.idle
 				end
 			end
 			
 			state :going_down do
 				def update
-					press_callback
+					@callbacks.press
 					
 					# transition to :active
 					to_active
@@ -220,13 +202,13 @@ module DIS
 			
 			state :active do
 				def update
-					hold_callback
+					@callbacks.hold
 				end
 			end
 			
 			state :going_up do
 				def update
-					release_callback
+					@callbacks.release
 					
 					# transition to :idle
 					to_idle
@@ -263,7 +245,7 @@ module DIS
 		def cancel
 			cancel_event
 			reset_search
-			cancel_callback
+			@callbacks.cancel
 		end
 		
 		def positive?
@@ -274,34 +256,102 @@ module DIS
 			return going_up? || idle?
 		end
 		
+		
+		#    ______      ______               __       
+		#   / ____/___ _/ / / /_  ____ ______/ /_______
+		#  / /   / __ `/ / / __ \/ __ `/ ___/ //_/ ___/
+		# / /___/ /_/ / / / /_/ / /_/ / /__/ ,< (__  ) 
+		# \____/\__,_/_/_/_.___/\__,_/\___/_/|_/____/  
+		# Definition only.  Execution is only ever handled internally
+		
+		attr_reader :callbacks
+		
+		
 		private
 		
-		# [:press, :hold, :release, :idle].each do |event|
-		# 	define_method "#{event}_callback" do
-		# 		instance_eval &@callbacks["on_#{event}".to_sym] if enabled?
-		# 	end
-		# end
 		
-		
-		def idle_callback
-			&@callbacks[:on_idle].call
-		end
-		
-		def press_callback
-			&@callbacks[:on_press].call
-		end
-		
-		def hold_callback
-			# TODO: give hold duration to the block
-			&@callbacks[:on_hold].call
-		end
-		
-		def release_callback
-			&@callbacks[:on_release].call
-		end
-		
-		def cancel_callback
-			&@callbacks[:on_cancel].call
+		# Multiple sets of callbacks can be bound to one sequence
+		# this class organizes those callback sets
+		# (disambiguation must be handled outside of this input parsing framework)
+		class CallbackManager
+			# NOTE: It is possible to force all callbacks to execute from outside of the input framework.  This may be problematic.
+			
+			# NOTE: Currently, all callbacks must be defined at once.  Attempting to define a second callback set with the same name will override the first set.
+			
+			CALLBACK_NAMES = [:press, :hold, :release, :idle, :cancel]
+			
+			
+			def initialize
+				@callbacks = Hash.new # name => set of callbacks
+			end
+			
+			def add(name, &block)
+				callback_set = CallbackSet.new &block
+				
+				@callbacks[name] = callback_set
+			end
+			
+			def delete(name)
+				@callbacks.delete name
+			end
+			
+			def include?(name)
+				@callbacks.include?(name)
+			end
+			
+			def clear
+				@callbacks.clear
+			end
+			
+			
+			# Run all stored callbacks
+			CALLBACK_NAMES.each do |type|
+				
+				define_method type do
+					@callbacks.each do |name, callback_set|
+						callback_set.send "#{type}_callback"
+					end
+				end
+				
+			end
+			
+			
+			private
+			
+			# sets of callbacks should not be definable outside of the provided interface
+			# although, the methods of the collection itself should be public,
+			# so that the collection can be further altered after initial creation
+			
+			
+			
+			# Hold one set of callbacks
+			class CallbackSet
+				NULL_CALLBACK = Proc.new {|o| }
+				
+				def initialize(&block)
+					@callbacks = Hash.new
+					
+					# CALLBACK_NAMES.each do |name|
+					# 	@callbacks[name] = NULL_CALLBACK
+					# end
+					
+					instance_eval &block if block
+				end
+				
+				CALLBACK_NAMES.each do |event|
+					# ===== callback definition ===== 
+					define_method "on_#{event}" do |&block|
+						@callbacks[event] = block
+					end
+					# private callback_name
+					
+					
+					# =====  callback execution ===== 
+					define_method "#{event}_callback" do |&block|
+						@callbacks[event].call if @callbacks[event]
+					end
+				end
+			end
 		end
 	end
 end
