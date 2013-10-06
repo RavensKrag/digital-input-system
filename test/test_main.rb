@@ -37,23 +37,22 @@ class Window < Gosu::Window
 		
 		@inpman = DIS::InputManager.new
 		
-		single = DIS::Sequence.new :single do
-			on_press do
+		single = DIS::Sequence.new :single
+			single.callbacks[:default].on_press do
 				puts "SINGLE BUTTON #{Gosu::milliseconds}"
 			end
 			
-			on_hold do
+			single.callbacks[:default].on_hold do
 				puts "ONE HOLD #{Gosu::milliseconds}"
 			end
 			
-			on_release do
+			single.callbacks[:default].on_release do
 				puts "it's dangerous to go alone"
 			end
 			
-			on_idle do
+			single.callbacks[:default].on_idle do
 				
 			end
-		end
 		single.press_events = [
 			DIS::Event.new(Gosu::KbD, :down)
 		]
@@ -67,23 +66,22 @@ class Window < Gosu::Window
 		
 		
 		
-		sequence = DIS::Sequence.new :sequence do
-			on_press do
+		sequence = DIS::Sequence.new :sequence
+			sequence.callbacks[:default].on_press do
 				puts "BUTTON DOWN"
 			end
 			
-			on_hold do
+			sequence.callbacks[:default].on_hold do
 				
 			end
 			
-			on_release do
+			sequence.callbacks[:default].on_release do
 				
 			end
 			
-			on_idle do
+			sequence.callbacks[:default].on_idle do
 				
 			end
-		end
 		sequence.press_events = [
 			DIS::Event.new(Gosu::KbA, :down,	0+300*0),
 			DIS::Event.new(Gosu::KbA, :up,	200+300*0),
@@ -104,23 +102,22 @@ class Window < Gosu::Window
 		# ERROR: false negative on reverse roll -> chord
 		# ex) roll(c,b,a) -> chord(a,b,c) -> chord(a,b,c)
 		# 		first chord not detected, but second chord is
-		chord = DIS::Sequence.new :chord do
-			on_press do
+		chord = DIS::Sequence.new :chord
+			chord.callbacks[:default].on_press do
 				puts "GOGOGOG!!!! #{Gosu::milliseconds}"
 			end
 			
-			on_hold do
+			chord.callbacks[:default].on_hold do
 				puts "GOGOGOG!!!! #{Gosu::milliseconds}"
 			end
 			
-			on_release do
+			chord.callbacks[:default].on_release do
 				puts "OUTTA HERE D:"
 			end
 			
-			on_idle do
+			chord.callbacks[:default].on_idle do
 				# puts "GOGOGOG!!!!"
 			end
-		end
 		chord.press_events = [
 			DIS::Event.new(Gosu::KbA, :down),
 			DIS::Event.new(Gosu::KbS, :down),
@@ -139,23 +136,22 @@ class Window < Gosu::Window
 		
 		
 		
-		mouse_click = DIS::Sequence.new :click do
-			on_press do
+		mouse_click = DIS::Sequence.new :click
+			mouse_click.callbacks[:default].on_press do
 				puts "----CLICK (START) #{Gosu::milliseconds}"
 			end
 			
-			on_hold do
+			mouse_click.callbacks[:default].on_hold do
 				puts "----CLICK #{Gosu::milliseconds}"
 			end
 			
-			on_release do
+			mouse_click.callbacks[:default].on_release do
 				puts "nope nope nope"
 			end
 			
-			on_idle do
+			mouse_click.callbacks[:default].on_idle do
 				# puts "GOGOGOG!!!!"
 			end
-		end
 		mouse_click.press_events = [
 			DIS::Event.new(Gosu::MsLeft, :down),
 		]
@@ -165,23 +161,22 @@ class Window < Gosu::Window
 		
 		
 		
-		shift = DIS::Sequence.new :shift do
-			on_press do
+		shift = DIS::Sequence.new :shift
+			shift.callbacks[:default].on_press do
 				puts "~~~shift start~~~ #{Gosu::milliseconds}"
 			end
 			
-			on_hold do
+			shift.callbacks[:default].on_hold do
 				puts "~~~shift~~~ #{Gosu::milliseconds}"
 			end
 			
-			on_release do
+			shift.callbacks[:default].on_release do
 				puts "outie~~"
 			end
 			
-			on_idle do
+			shift.callbacks[:default].on_idle do
 				# puts "GOGOGOG!!!!"
 			end
-		end
 		shift.press_events = [
 			DIS::Event.new(Gosu::KbLeftShift, :down),
 		]
@@ -190,23 +185,22 @@ class Window < Gosu::Window
 		]
 		
 		
-		mouse_and_keyboard = DIS::Accelerator.new :shift_click, shift, mouse_click do
-			on_press do
+		mouse_and_keyboard = DIS::Accelerator.new :shift_click, shift, mouse_click
+			mouse_and_keyboard.callbacks[:default].on_press do
 				puts "+-+-+ Start #{Gosu::milliseconds}"
 			end
 			
-			on_hold do
+			mouse_and_keyboard.callbacks[:default].on_hold do
 				puts "+-+-+ Together #{Gosu::milliseconds}"
 			end
 			
-			on_release do
+			mouse_and_keyboard.callbacks[:default].on_release do
 				puts "X-X-X-X-X-X end"
 			end
 			
-			on_idle do
+			mouse_and_keyboard.callbacks[:default].on_idle do
 				# puts "GOGOGOG!!!!"
 			end
-		end
 		
 		
 		

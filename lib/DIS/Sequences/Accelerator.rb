@@ -7,8 +7,8 @@ module DIS
 		# Assuming it itself is a Sequence, so it can be used in the same way as other Sequences
 		# if that is not so, maybe it should only contain Sequences
 		
-		def initialize(name, *sequences, &block)
-			super(name, &block)
+		def initialize(name, *sequences)
+			super(name)
 			
 			@sub_sequences = sequences
 		end

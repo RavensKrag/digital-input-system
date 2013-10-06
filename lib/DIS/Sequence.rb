@@ -19,7 +19,7 @@ module DIS
 		
 		attr_reader :name
 		
-		def initialize(name, &block)
+		def initialize(name)
 			super()
 			
 			@name = name 
@@ -31,10 +31,6 @@ module DIS
 			
 			# callbacks to be fired on events
 			@callbacks = CallbackManager.new
-			
-			if block
-				@callbacks.add :default, &block
-			end
 		end
 		
 		def <=>(other)
@@ -285,10 +281,13 @@ module DIS
 				@callbacks = Hash.new # name => set of callbacks
 			end
 			
-			def add(name, &block)
-				callback_set = CallbackSet.new &block
+			def [](name)
+				# return a callback set associated with the given name
+				# create a new set if no set is currently established
 				
-				@callbacks[name] = callback_set
+				@callbacks[name] = CallbackSet.new unless @callbacks[name]
+				
+				return @callbacks[name]
 			end
 			
 			def delete(name)
@@ -326,11 +325,24 @@ module DIS
 			
 			# Hold one set of callbacks
 			class CallbackSet
-				def initialize(&block)
+				# TODO: Consider using a bunch of instance variables instead of a hash
+				# don't really need the full capabilities of a hash
+				
+				def initialize
 					@callbacks = Hash.new
-					
-					instance_eval &block if block
 				end
+				
+				
+				# because of the instance eval,
+				# the callback is bound to the execution scope of the instance_eval,
+				# which is this object
+				# so even if the callback is executed without instance_eval,
+				# it will still have this object as it's execution scope
+				# 
+				# this is not the desired behavior
+				# 
+				# the callback should execute within the scope of the object where it was defined
+				
 				
 				CALLBACK_NAMES.each do |event|
 					# ===== callback definition ===== 

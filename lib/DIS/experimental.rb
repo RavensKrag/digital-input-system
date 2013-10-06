@@ -289,5 +289,45 @@ single.callbacks.add :this do
 end
 
 
+single.callbacks[:this].on_press do
+	
+end
+
+single.callbacks[:this].on_hold do
+	
+end
+
+single.callbacks[:this].on_release do
+	
+end
+
+single.callbacks[:this].on_idle do
+	
+end
+
+single.callbacks.clear
+single.callbacks.delete :this
+
+
+
+single[:this].on_press do
+	
+end
+
+single[:this].on_hold do
+	
+end
+
+single[:this].on_release do
+	
+end
+
+single[:this].on_idle do
+	
+end
+
+
+
+
 
 # could be able to add with the same name, and register new callbacks
