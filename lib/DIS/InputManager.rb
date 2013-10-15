@@ -52,6 +52,18 @@ module DIS
 			
 		end
 		
+		# access a particular sequence under the control of this input manager
+		# returns nil if sequence with requested identifier not found
+		def[](id)
+			selection = @sequences.select{ |s| s.name == id }.first
+			
+			# i = @sequences.index{ |s| s.name == id }
+			# selection = @sequences[i]
+			
+			
+			return selection
+		end
+		
 		def update
 			# state-maintaining callback should not be made if there is a active sequence of higher complexity
 			@sequences.each do |s|

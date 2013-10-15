@@ -1,3 +1,3 @@
 module DIS
-	VERSION = "0.00.9"
+	VERSION = "0.01.0"
 end
