@@ -55,6 +55,18 @@ module DIS
 		# access a particular sequence under the control of this input manager
 		# returns nil if sequence with requested identifier not found
 		def[](id)
+			# being able to access the whole sequence in this way means
+			# it is possible to change the events to launch the sequence
+			# even when you should not do so
+			# 
+			# this perhaps should be explicitly guarded against,
+			# for the maturity of the library,
+			# and to help others use it better,
+			# but it's not really something I would want to do right now
+			# 
+			# maybe it's something that should actually be allowed,
+			# in which case the system should just auto adjust
+			
 			selection = @sequences.select{ |s| s.name == id }.first
 			
 			# i = @sequences.index{ |s| s.name == id }
@@ -298,6 +310,13 @@ module DIS
 			
 			marked =	sorted_sequences.select do |sequence|
 							if sequence.trigger_press? event
+								# 
+								# sequence.sub_sequences.each do |sub_seq|
+								# 	sub_seq.disable
+								# end
+								
+								
+								
 								sequence.press
 								
 								true
